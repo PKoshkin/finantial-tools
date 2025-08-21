@@ -126,6 +126,8 @@ def compute_finantial_model(
                 "monthly_income": current_monthly_income,
                 "monthly_leftover": current_monthly_income - current_monthly_spending - current_monthly_rent,
                 "invested_capital": initial_capital,
+                "etf_capital": initial_capital,
+                "spending_not_covered_by_3_percent_etf": (current_monthly_spending + current_monthly_rent) - (initial_capital * 3 / 100) / 12,
                 "property_value": 0,
                 "property_equity": 0,
             }
@@ -168,6 +170,8 @@ def compute_finantial_model(
                 "monthly_income": current_monthly_income,
                 "monthly_leftover": monthly_leftover,
                 "invested_capital": invested_capital,
+                "etf_capital": etf_capital,
+                "spending_not_covered_by_3_percent_etf": (current_monthly_spending + monthly_apartment_spend) - (etf_capital * 3 / 100) / 12,
                 "property_value": property_value,
                 "property_equity": property_equity,
             }
