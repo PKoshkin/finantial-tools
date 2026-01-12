@@ -102,9 +102,12 @@ def compute_finantial_model(
     # Guard: if initial capital cannot cover down payment and fees, allow negative cash
     # (represents borrowing from other sources). Keep the model simple and explicit.
 
-    # Mortgage annuity model: yearly payment is (interest + amortization) * base.
-    # Base is reset on refinancing years.
+    # Mortgage annuity model: fixed monthly payment until refinancing.
+    # Each month: interest is calculated from current loan_outstanding,
+    # principal repayment = fixed_payment - interest.
+    # Base and fixed_monthly_payment are reset on refinancing years.
     loan_base = loan_outstanding
+    fixed_monthly_payment = loan_base * (mortgage_interest_rate + mortgage_yearly_repayment_rate) / 12.0
 
     current_monthly_income = monthly_net_income
     current_monthly_rent = cold_rent_monthly_cost
@@ -136,12 +139,21 @@ def compute_finantial_model(
         # Property value grows with inflation as a proxy
         property_value = mortgage_apartment_price * (1.0 + yearly_apartment_raise_rate) ** year
 
-        monthly_interest_payment = loan_base * mortgage_interest_rate / 12.0
-        monthly_loan_repayment = loan_base * mortgage_yearly_repayment_rate / 12.0
-        monthly_apartment_spend = current_monthly_rent + monthly_interest_payment + monthly_loan_repayment
+        # Track totals for reporting (will accumulate monthly values)
+        total_interest_paid_this_year = 0.0
+        total_principal_paid_this_year = 0.0
 
         # Cashflow and investments (ETF) done monthly
         for _ in range(12):
+            # Annuity: interest calculated from current outstanding, principal is the rest
+            monthly_interest_payment = loan_outstanding * mortgage_interest_rate / 12.0
+            monthly_loan_repayment = fixed_monthly_payment - monthly_interest_payment
+
+            total_interest_paid_this_year += monthly_interest_payment
+            total_principal_paid_this_year += monthly_loan_repayment
+
+            monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
+
             monthly_leftover = (
                 current_monthly_income
                 - monthly_apartment_spend
@@ -152,6 +164,11 @@ def compute_finantial_model(
             # Update monthly spending with inflation for next month
             current_monthly_spending *= 1.0 + monthly_inflation_rate
             loan_outstanding -= monthly_loan_repayment
+
+        # Average monthly values for reporting
+        monthly_interest_payment = total_interest_paid_this_year / 12.0
+        monthly_loan_repayment = total_principal_paid_this_year / 12.0
+        monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
 
         # Estimated total capital = invested capital + property equity
         property_equity = property_value - loan_outstanding
@@ -182,16 +199,12 @@ def compute_finantial_model(
         current_monthly_rent *= 1.0 + cold_rent_yearly_increase_rate
         # monthly spending already compounded intra-year; keep its last value going forward
 
-        # Recalculate loan base on refinancing schedule
+        # Recalculate loan base and fixed payment on refinancing schedule
         if (
             loan_outstanding > 0
             and (year % mortgate_refinancing_years == 0)
         ):
             loan_base = loan_outstanding
-
-        # Monthly spend on apartments for next year
-        monthly_interest_payment = loan_base * mortgage_interest_rate / 12.0
-        monthly_loan_repayment = loan_base * mortgage_yearly_repayment_rate / 12.0
-        monthly_apartment_spend = current_monthly_rent + monthly_interest_payment + monthly_loan_repayment
+            fixed_monthly_payment = loan_base * (mortgage_interest_rate + mortgage_yearly_repayment_rate) / 12.0
 
     return pd.DataFrame(rows)
