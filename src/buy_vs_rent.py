@@ -142,6 +142,7 @@ def compute_finantial_model(
         # Track totals for reporting (will accumulate monthly values)
         total_interest_paid_this_year = 0.0
         total_principal_paid_this_year = 0.0
+        total_monthly_spending_this_year = 0.0
 
         # Cashflow and investments (ETF) done monthly
         for _ in range(12):
@@ -151,6 +152,7 @@ def compute_finantial_model(
 
             total_interest_paid_this_year += monthly_interest_payment
             total_principal_paid_this_year += monthly_loan_repayment
+            total_monthly_spending_this_year += current_monthly_spending
 
             monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
 
@@ -168,6 +170,7 @@ def compute_finantial_model(
         # Average monthly values for reporting
         monthly_interest_payment = total_interest_paid_this_year / 12.0
         monthly_loan_repayment = total_principal_paid_this_year / 12.0
+        avg_monthly_spending = total_monthly_spending_this_year / 12.0
         monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
 
         # Estimated total capital = invested capital + property equity
@@ -188,7 +191,7 @@ def compute_finantial_model(
                 "monthly_leftover": monthly_leftover,
                 "invested_capital": invested_capital,
                 "etf_capital": etf_capital,
-                "spending_not_covered_by_3_percent_etf": (current_monthly_spending + monthly_apartment_spend) - (etf_capital * 3 / 100) / 12,
+                "spending_not_covered_by_3_percent_etf": (avg_monthly_spending + monthly_apartment_spend) - (etf_capital * 3 / 100) / 12,
                 "property_value": property_value,
                 "property_equity": property_equity,
             }
