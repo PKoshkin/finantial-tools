@@ -19,6 +19,7 @@ def compute_finantial_model(
     yearly_income_increase_rate: float,
     years: int,
     sondertilgung_yearly_rate: float = 0.0,
+    etf_tax_rate: float = 0.0,
 ) -> pd.DataFrame:
     """
     Compute a yearly financial model when simultaneously owning (with a mortgage) and renting.
@@ -33,6 +34,8 @@ def compute_finantial_model(
     - leftover cash after apartment spending and monthly_spending is invested into ETF monthly
     - if sondertilgung_yearly_rate > 0, a fraction of the original loan is paid extra each year
       (reserved monthly from leftover, applied at year end), reducing principal faster
+    - if etf_tax_rate > 0, capital gains tax is applied to ETF profits when computing
+      etf_capital_after_tax (etf_capital itself stays gross for simulation continuity)
     """
 
     # Type assertions
@@ -53,6 +56,7 @@ def compute_finantial_model(
     assert isinstance(yearly_income_increase_rate, (int, float))
     assert isinstance(years, int)
     assert isinstance(sondertilgung_yearly_rate, (int, float))
+    assert isinstance(etf_tax_rate, (int, float))
 
     mortgage_down_payment = mortgage_apartment_price * mortgage_down_payment_rate
     mortgage_total_fees = mortgage_apartment_price * mortgage_total_fees_rate
@@ -96,6 +100,8 @@ def compute_finantial_model(
         raise ValueError("mortgate_refinancing_years must be >= 0")
     if sondertilgung_yearly_rate < 0:
         raise ValueError("sondertilgung_yearly_rate must be >= 0")
+    if not 0.0 <= etf_tax_rate < 1.0:
+        raise ValueError("etf_tax_rate must be >= 0 and < 1.0")
 
     # Initial loan and capital
     loan_outstanding = mortgage_apartment_price - mortgage_down_payment
@@ -104,6 +110,7 @@ def compute_finantial_model(
     # Down payment and fees are assumed to be paid from initial capital upfront
     invested_capital = initial_capital - mortgage_down_payment - mortgage_total_fees
     etf_capital = initial_capital - mortgage_down_payment - mortgage_total_fees
+    etf_cost_basis = etf_capital
 
     # Guard: if initial capital cannot cover down payment and fees, allow negative cash
     # (represents borrowing from other sources). Keep the model simple and explicit.
@@ -126,6 +133,7 @@ def compute_finantial_model(
     sondertilgung_monthly_reserve = max_sondertilgung / 12.0
     cumulative_interest_paid = 0.0
 
+    initial_etf = initial_capital - mortgage_down_payment - mortgage_total_fees
     rows = [
             {
                 "year": 0,
@@ -139,8 +147,9 @@ def compute_finantial_model(
                 "monthly_income": current_monthly_income,
                 "monthly_leftover": current_monthly_income - current_monthly_spending - current_monthly_rent,
                 "invested_capital": initial_capital,
-                "etf_capital": initial_capital,
-                "spending_not_covered_by_3_percent_etf": (current_monthly_spending + current_monthly_rent) - (initial_capital * 3 / 100) / 12,
+                "etf_capital": initial_etf,
+                "etf_capital_after_tax": initial_etf,
+                "spending_not_covered_by_3_percent_etf": (current_monthly_spending + current_monthly_rent) - (initial_etf * 3 / 100) / 12,
                 "property_value": 0,
                 "property_equity": 0,
                 "yearly_sondertilgung": 0,
@@ -190,6 +199,7 @@ def compute_finantial_model(
             etf_contribution = monthly_leftover - current_sondertilgung_reserve
             invested_capital += monthly_leftover
             etf_capital = etf_capital * (1.0 + monthly_etf_rate) + etf_contribution
+            etf_cost_basis += etf_contribution
             current_monthly_spending *= 1.0 + monthly_inflation_rate
 
         # Apply sondertilgung at year end
@@ -209,9 +219,13 @@ def compute_finantial_model(
         avg_monthly_spending = total_monthly_spending_this_year / 12.0
         monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
 
+        # ETF after tax: tax only on gains, not on cost basis
+        etf_gain = max(0.0, etf_capital - etf_cost_basis)
+        etf_capital_after_tax = etf_capital - etf_gain * etf_tax_rate
+
         # Estimated total capital = invested capital + property equity
         property_equity = property_value - loan_outstanding
-        estimated_total_capital = property_equity + etf_capital
+        estimated_total_capital = property_equity + etf_capital_after_tax
 
         rows.append(
             {
@@ -227,7 +241,8 @@ def compute_finantial_model(
                 "monthly_leftover": monthly_leftover,
                 "invested_capital": invested_capital,
                 "etf_capital": etf_capital,
-                "spending_not_covered_by_3_percent_etf": (avg_monthly_spending + monthly_apartment_spend) - (etf_capital * 3 / 100) / 12,
+                "etf_capital_after_tax": etf_capital_after_tax,
+                "spending_not_covered_by_3_percent_etf": (avg_monthly_spending + monthly_apartment_spend) - (etf_capital_after_tax * 3 / 100) / 12,
                 "property_value": property_value,
                 "property_equity": property_equity,
                 "yearly_sondertilgung": actual_sondertilgung,
