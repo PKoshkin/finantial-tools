@@ -18,6 +18,7 @@ def compute_finantial_model(
     monthly_spending: float,
     yearly_income_increase_rate: float,
     years: int,
+    sondertilgung_yearly_rate: float = 0.0,
 ) -> pd.DataFrame:
     """
     Compute a yearly financial model when simultaneously owning (with a mortgage) and renting.
@@ -30,6 +31,8 @@ def compute_finantial_model(
     Additional assumptions for this version:
     - monthly_spending grows monthly by inflation
     - leftover cash after apartment spending and monthly_spending is invested into ETF monthly
+    - if sondertilgung_yearly_rate > 0, a fraction of the original loan is paid extra each year
+      (reserved monthly from leftover, applied at year end), reducing principal faster
     """
 
     # Type assertions
@@ -49,6 +52,7 @@ def compute_finantial_model(
     assert isinstance(monthly_spending, (int, float))
     assert isinstance(yearly_income_increase_rate, (int, float))
     assert isinstance(years, int)
+    assert isinstance(sondertilgung_yearly_rate, (int, float))
 
     mortgage_down_payment = mortgage_apartment_price * mortgage_down_payment_rate
     mortgage_total_fees = mortgage_apartment_price * mortgage_total_fees_rate
@@ -90,6 +94,8 @@ def compute_finantial_model(
         raise ValueError("years must be > 0")
     if mortgate_refinancing_years < 0:
         raise ValueError("mortgate_refinancing_years must be >= 0")
+    if sondertilgung_yearly_rate < 0:
+        raise ValueError("sondertilgung_yearly_rate must be >= 0")
 
     # Initial loan and capital
     loan_outstanding = mortgage_apartment_price - mortgage_down_payment
@@ -116,6 +122,10 @@ def compute_finantial_model(
     monthly_inflation_rate = (1.0 + yearly_inflation_rate) ** (1.0 / 12.0) - 1.0
     monthly_etf_rate = (1.0 + etf_yearly_return_rate) ** (1.0 / 12.0) - 1.0
 
+    max_sondertilgung = loan_outstanding * sondertilgung_yearly_rate
+    sondertilgung_monthly_reserve = max_sondertilgung / 12.0
+    cumulative_interest_paid = 0.0
+
     rows = [
             {
                 "year": 0,
@@ -133,6 +143,8 @@ def compute_finantial_model(
                 "spending_not_covered_by_3_percent_etf": (current_monthly_spending + current_monthly_rent) - (initial_capital * 3 / 100) / 12,
                 "property_value": 0,
                 "property_equity": 0,
+                "yearly_sondertilgung": 0,
+                "cumulative_interest_paid": 0,
             }
     ]
     for year in range(1, years + 1):
@@ -146,44 +158,68 @@ def compute_finantial_model(
 
         # Cashflow and investments (ETF) done monthly
         for _ in range(12):
-            # Annuity: interest calculated from current outstanding, principal is the rest
-            monthly_interest_payment = loan_outstanding * mortgage_interest_rate / 12.0
-            monthly_loan_repayment = fixed_monthly_payment - monthly_interest_payment
+            if loan_outstanding > 0:
+                monthly_interest_payment = loan_outstanding * mortgage_interest_rate / 12.0
+                monthly_loan_repayment = min(
+                    fixed_monthly_payment - monthly_interest_payment,
+                    loan_outstanding,
+                )
+                actual_mortgage_payment = monthly_interest_payment + monthly_loan_repayment
+                loan_outstanding -= monthly_loan_repayment
+                if loan_outstanding <= 0:
+                    loan_outstanding = 0.0
+                    fixed_monthly_payment = 0.0
+                current_sondertilgung_reserve = sondertilgung_monthly_reserve
+            else:
+                monthly_interest_payment = 0.0
+                monthly_loan_repayment = 0.0
+                actual_mortgage_payment = 0.0
+                current_sondertilgung_reserve = 0.0
 
             total_interest_paid_this_year += monthly_interest_payment
             total_principal_paid_this_year += monthly_loan_repayment
             total_monthly_spending_this_year += current_monthly_spending
 
-            monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
+            monthly_apartment_spend = current_monthly_rent + actual_mortgage_payment
 
             monthly_leftover = (
                 current_monthly_income
                 - monthly_apartment_spend
                 - current_monthly_spending
             )
+            etf_contribution = monthly_leftover - current_sondertilgung_reserve
             invested_capital += monthly_leftover
-            etf_capital = etf_capital * (1.0 + monthly_etf_rate) + monthly_leftover
-            # Update monthly spending with inflation for next month
+            etf_capital = etf_capital * (1.0 + monthly_etf_rate) + etf_contribution
             current_monthly_spending *= 1.0 + monthly_inflation_rate
-            loan_outstanding -= monthly_loan_repayment
+
+        # Apply sondertilgung at year end
+        actual_sondertilgung = 0.0
+        if loan_outstanding > 0 and max_sondertilgung > 0:
+            actual_sondertilgung = min(max_sondertilgung, loan_outstanding)
+            loan_outstanding -= actual_sondertilgung
+            if loan_outstanding <= 0:
+                loan_outstanding = 0.0
+                fixed_monthly_payment = 0.0
+
+        cumulative_interest_paid += total_interest_paid_this_year
 
         # Average monthly values for reporting
-        monthly_interest_payment = total_interest_paid_this_year / 12.0
-        monthly_loan_repayment = total_principal_paid_this_year / 12.0
+        avg_monthly_interest = total_interest_paid_this_year / 12.0
+        avg_monthly_repayment = total_principal_paid_this_year / 12.0
         avg_monthly_spending = total_monthly_spending_this_year / 12.0
         monthly_apartment_spend = current_monthly_rent + fixed_monthly_payment
 
         # Estimated total capital = invested capital + property equity
         property_equity = property_value - loan_outstanding
-        estimated_total_capital =  property_equity + etf_capital
+        estimated_total_capital = property_equity + etf_capital
 
         rows.append(
             {
                 "year": year,
                 "total_loan": loan_outstanding,
                 "estimated_total_capital": estimated_total_capital,
-                "monthly_interest_payment": monthly_interest_payment,
-                "monthly_loan_repayment": monthly_loan_repayment,
+                "monthly_interest_payment": avg_monthly_interest,
+                "monthly_loan_repayment": avg_monthly_repayment,
                 "monthly_rent": current_monthly_rent,
                 "monthly_apartment_spend": monthly_apartment_spend,
                 "monthly_spending": current_monthly_spending,
@@ -194,20 +230,40 @@ def compute_finantial_model(
                 "spending_not_covered_by_3_percent_etf": (avg_monthly_spending + monthly_apartment_spend) - (etf_capital * 3 / 100) / 12,
                 "property_value": property_value,
                 "property_equity": property_equity,
+                "yearly_sondertilgung": actual_sondertilgung,
+                "cumulative_interest_paid": cumulative_interest_paid,
             }
         )
 
         # Prepare next year values (income/rent growth and possible refinancing)
         current_monthly_income *= 1.0 + yearly_income_increase_rate
         current_monthly_rent *= 1.0 + cold_rent_yearly_increase_rate
-        # monthly spending already compounded intra-year; keep its last value going forward
 
         # Recalculate loan base and fixed payment on refinancing schedule
         if (
             loan_outstanding > 0
+            and mortgate_refinancing_years > 0
             and (year % mortgate_refinancing_years == 0)
         ):
             loan_base = loan_outstanding
             fixed_monthly_payment = loan_base * (mortgage_interest_rate + mortgage_yearly_repayment_rate) / 12.0
 
     return pd.DataFrame(rows)
+
+
+def calculate_early_repayment_penalty(
+    remaining_principal: float,
+    loan_rate: float,
+    market_rate: float,
+    remaining_years: float,
+) -> float:
+    """
+    Approximate Vorfälligkeitsentschädigung (early repayment penalty).
+
+    After 10 years from loan start, penalty is 0 (with 6 months notice).
+    Before that, penalty compensates the bank for the interest rate differential
+    over the remaining Zinsbindung period.
+    """
+    if remaining_years <= 0:
+        return 0.0
+    return remaining_principal * max(0.0, loan_rate - market_rate) * remaining_years
