@@ -91,14 +91,18 @@ from .component import (
 )
 from .components import (
     REMAINDER,
+    Earner,
     Etf,
+    GermanHousehold,
     Home,
     InvestmentProperty,
     Mortgage,
+    PrivateHealthInsurance,
     Rent,
     Salary,
     Spending,
 )
+from .german_tax import TaxSystem
 from .model import FinancialModel
 from .reporting import (
     FLAT_COLUMNS,
@@ -115,18 +119,22 @@ __all__ = [
     "CashFlow",
     "CashPhase",
     "Compounding",
+    "Earner",
     "Etf",
     "FinancialComponent",
     "FinancialModel",
+    "GermanHousehold",
     "Home",
     "InvestmentProperty",
     "ModelParams",
     "MonthContext",
     "Mortgage",
+    "PrivateHealthInsurance",
     "Rent",
     "Salary",
     "SetupContext",
     "Spending",
+    "TaxSystem",
     "YearContext",
     "calculate_early_repayment_penalty",
     "flat",
