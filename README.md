@@ -1,68 +1,130 @@
 # finantial-tools
 
-Personal financial planning tools built around **one unified financial model**.
+Personal financial planning tools built around **one model made of components**.
 
 ## Structure
 
 ```
-src/financial_model.py      # the single core model (Scenario + simulate)
+src/model/                  # the model: FinancialModel + the component types
 tests/                      # test suite (pytest)
-tests/golden/               # pinned outputs of the pre-refactoring legacy models
-notebook/                   # analyses; each notebook = the same core, different parameters
+tests/golden/               # pinned forecasts the model must reproduce
+scripts/                    # notebook execution and output diffing
+notebook/                   # analyses; each notebook = the same model, different components
+artifacts/baseline/         # reference notebook run
 ```
 
-## The unified model
+## The model
 
-`src/financial_model.py` contains a monthly-resolution simulation engine. A
-scenario is described by a single `Scenario` dataclass; `simulate(scenario)`
-returns a yearly `DataFrame` with the forecast of all financial indicators
-(loan, property value/equity, ETF capital gross/after tax, total wealth,
-monthly cash flows, interest paid, ...).
-
-Every feature is off by default, so a scenario only sets the factors it cares
-about — and all factors can be combined in one scenario:
-
-| Factor | Parameters |
-|---|---|
-| Household cash flow | `monthly_net_income`, `yearly_income_increase_rate`, `monthly_spending`, `yearly_inflation_rate` |
-| Renting your home | `monthly_rent`, `yearly_rent_increase_rate` |
-| Buying property | `apartment_price`, `yearly_apartment_price_increase_rate`, `mortgage_down_payment_rate`, `mortgage_fees_rate` |
-| Mortgage (annuity) | `mortgage_interest_rate`, `mortgage_yearly_repayment_rate`, `mortgage_refinancing_years`, `sondertilgung_yearly_rate` |
-| Renting the property out | `monthly_rental_income`, `yearly_rental_income_increase_rate` |
-| ETF investing | `etf_yearly_return_rate`, `etf_tax_rate`, `etf_yearly_withdrawal_rate` |
+A forecast is a `FinancialModel` and the components it is built from. The model
+holds only what every component shares — the horizon, the starting age,
+inflation. Everything else (income, spending, rent, property, portfolios) is a
+component, and each component type influences the simulation in its own way.
 
 ```python
-from src.financial_model import Scenario, simulate, replace
+from src.model import Etf, FinancialModel, Home, Mortgage, Salary, Spending
 
-scenario = Scenario(
+model = FinancialModel(
+    components=[
+        Salary(monthly_amount=5_000, yearly_increase_rate=0.02),
+        Spending(monthly_amount=2_000),              # follows the model's inflation
+        Home(
+            price=450_000,
+            yearly_price_increase_rate=0.03,
+            mortgage=Mortgage(
+                interest_rate=0.038,
+                down_payment_rate=0.10,
+                fees_rate=0.10,
+                yearly_repayment_rate=0.015,
+                refinancing_years=10,
+                sondertilgung_yearly_rate=0.05,
+            ),
+        ),
+        Etf(initial_capital=100_000, yearly_return_rate=0.07, tax_rate=0.26375),
+    ],
     years=30,
-    initial_capital=100_000,
-    monthly_net_income=5_000,
-    monthly_spending=2_000,
+    start_age=35,
     yearly_inflation_rate=0.02,
-    apartment_price=450_000,
-    mortgage_interest_rate=0.038,
-    mortgage_down_payment_rate=0.10,
-    mortgage_fees_rate=0.10,
-    mortgage_yearly_repayment_rate=0.015,
-    mortgage_refinancing_years=10,
-    sondertilgung_yearly_rate=0.05,
-    etf_yearly_return_rate=0.07,
-    etf_tax_rate=0.26375,
 )
-df = simulate(scenario)
-
-# scenario sweeps
-df_no_st = simulate(replace(scenario, sondertilgung_yearly_rate=0.0))
+df = model.run()
 ```
 
-Model semantics (year-0 row, tax/cost-basis treatment, Sondertilgung reserve,
-withdrawal ordering) are documented in the module docstring of
-[src/financial_model.py](src/financial_model.py).
+### Model parameters
+
+| Parameter | Meaning |
+|---|---|
+| `years` | horizon; the forecast has `years + 1` rows |
+| `start_age` | optional; adds an `age` column, changes nothing else |
+| `yearly_inflation_rate` | default growth for `Spending` |
+| `safe_withdrawal_rate` | reporting only, feeds `monthly_costs_not_covered_by_safe_withdrawal` |
+
+### Components
+
+| Component | How many | Parameters |
+|---|---|---|
+| `Salary` | any | `monthly_amount`, `yearly_increase_rate` |
+| `Spending` | any | `monthly_amount`, `yearly_increase_rate` (`None` → the model's inflation) |
+| `Rent` — your own housing | 0 or 1 | `monthly_amount`, `yearly_increase_rate` |
+| `Home` — the place you live in | 0 or 1 | `price`, `yearly_price_increase_rate`, `mortgage` |
+| `InvestmentProperty` — bought to rent out | any | the above plus `monthly_rental_income`, `yearly_rental_income_increase_rate` |
+| `Etf` — a portfolio | any | `initial_capital`, `yearly_return_rate`, `tax_rate`, `monthly_investment`, `yearly_withdrawal_rate` |
+
+`Mortgage` is not a component but a value object nested in a property
+(`interest_rate`, `down_payment_rate`, `fees_rate`, `yearly_repayment_rate`,
+`refinancing_years`, `sondertilgung_yearly_rate`), because a loan here always
+belongs to one property and is derived from its price.
+
+Rates of return are per component: two portfolios can grow at different rates
+and be taxed differently.
+
+### Where the money goes
+
+Every month the components produce signed cash flows in a fixed order — income,
+rental income, spending, rent, debt service — and what is left over lands in the
+**cash sink**: the `Etf` whose `monthly_investment` is `REMAINDER` (the
+default). Exactly one portfolio must be the sink; give the others a fixed
+`monthly_investment` amount. `Etf.cash(initial_capital=...)` is a zero-return,
+untaxed portfolio, i.e. money in an account.
+
+The sink also pays for the purchases at t=0 (down payment and fees) and covers
+deficits by selling. Its capital may go **negative** when the cash flow cannot
+fund the plan — that is an implicit loan at the portfolio's own rate, so check
+`(df.etf_capital < 0).any()` before trusting a comparison.
+
+### Sweeps
+
+Models are immutable; `replaced()` returns a new one, so a sweep never disturbs
+the baseline:
+
+```python
+model.replaced("home.mortgage", sondertilgung_yearly_rate=0.0)   # a component, or a nested object
+model.replaced("etf", yearly_return_rate=0.05)
+model.replaced(years=20)                                          # the model's own parameters
+model.sweep("home.mortgage", "sondertilgung_yearly_rate", [0.0, 0.03, 0.05])
+```
+
+### The forecast
+
+`run()` returns a DataFrame with one row per year (row 0 is the state right
+after the t=0 purchases) and two kinds of columns:
+
+- the model-wide totals — `total_loan`, `property_value`, `etf_capital`,
+  `estimated_total_capital`, `monthly_leftover`, ... — each the sum over the
+  components that feed it;
+- a `<component>.<key>` block per component, e.g. `berlin.total_loan`,
+  `pension.capital_after_tax`.
+
+`flat(df)` drops the per-component block when you only want to look at the
+totals.
+
+Model semantics — year-0 row, tax and cost-basis treatment, the Sondertilgung
+reserve, withdrawal ordering — are documented in the module docstring of
+[src/model/\_\_init\_\_.py](src/model/__init__.py); the exact order in which the
+engine calls the component hooks is in
+[src/model/model.py](src/model/model.py).
 
 ## Notebooks
 
-All notebooks import the same core and differ only in parameters:
+All notebooks build the same kind of model and differ only in components:
 
 - `buy_vs_rent.ipynb` — buy your home with a mortgage vs rent + invest in ETF
 - `sondertilgung_vs_etf.ipynb` — extra mortgage repayments vs ETF, breakeven ETF rate, early-repayment penalty, MSCI World stats
@@ -75,14 +137,31 @@ All notebooks import the same core and differ only in parameters:
 .venv/bin/python -m pytest tests/ -q
 ```
 
-The suite has two layers:
+Three layers:
 
-1. **Legacy equivalence** — before the refactoring the repo contained three
-   separate models; their outputs for the notebook scenarios are pinned in
-   `tests/golden/` and the unified model reproduces them wherever semantics
-   intentionally coincide (the deliberate deviations — including two legacy
-   money-leak bugs that were fixed — are documented in
-   [tests/test_financial_model.py](tests/test_financial_model.py)).
-2. **Invariants** — cash conservation, closed-form annuity amortization and
-   ETF compounding, tax-on-gains-only, Sondertilgung caps, refinancing
-   behavior, validation.
+1. **Baseline equivalence** — `tests/golden/baseline_*.csv` pins the forecast of
+   the pre-component model for every notebook configuration plus four edge
+   cases. The component model must reproduce them **exactly**
+   (`check_exact=True`), which is what keeps floating-point reassociation from
+   silently moving the numbers.
+2. **Legacy equivalence** — before that, the repo held three separate models;
+   their outputs are pinned in `tests/golden/legacy_*.csv` and still reproduced
+   wherever the semantics intentionally coincide. The deliberate deviations,
+   including two money-leak bugs that were fixed, are documented in
+   [tests/test_legacy_equivalence.py](tests/test_legacy_equivalence.py).
+3. **Invariants** — cash conservation, closed-form annuity amortization and
+   portfolio compounding, tax-on-gains-only, Sondertilgung caps, refinancing,
+   validation, and that every total really is the sum of its components.
+
+## Checking a change against the notebooks
+
+```bash
+.venv/bin/python scripts/run_notebooks.py --out artifacts/after
+```
+
+```bash
+.venv/bin/python scripts/diff_notebook_outputs.py artifacts/baseline artifacts/after
+```
+
+The diff covers every number the notebooks print or render as a table; images
+are excluded because they are not stable at the byte level.
