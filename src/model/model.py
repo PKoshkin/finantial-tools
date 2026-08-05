@@ -5,15 +5,15 @@ which the engine calls the component hooks is the whole contract; it is spelled
 out in `run()` and must not be reshuffled, because the forecast is pinned bit
 for bit against the pre-refactoring model in tests/test_baseline_equivalence.py.
 
-Two arithmetic conventions are inherited deliberately and must survive any
-future edit:
+Two conventions must survive any future edit:
 
-- Mortgage interest uses a plain `rate / 12`, while ETF returns and inflation
-  use the geometric `(1 + rate) ** (1/12) - 1`. The asymmetry is inconsistent
-  but it is what every pinned figure was computed with.
+- How a yearly rate becomes a monthly one is a per-component choice, declared
+  by `Compounding`. The defaults — `NOMINAL` for a mortgage's Sollzins,
+  `EFFECTIVE` for returns and inflation — are what every pinned figure was
+  computed with, so changing a default moves the golden fixtures.
 - Sums are built as running left-to-right chains, never as
-  `sum(inflows) - sum(outflows)`. In floating point those are different
-  numbers.
+  `sum(inflows) - sum(outflows)`, and one-off draws are subtracted one at a
+  time. In floating point those are different numbers.
 """
 
 from __future__ import annotations
@@ -34,7 +34,6 @@ from .component import (
     YearContext,
     check_amount,
     check_growth_rate,
-    monthly_rate,
 )
 from .reporting import RESERVED_NAMES, ReportSource, build_row, to_frame
 
@@ -83,7 +82,6 @@ class FinancialModel:
             start_age=start_age,
             yearly_inflation_rate=yearly_inflation_rate,
             safe_withdrawal_rate=safe_withdrawal_rate,
-            monthly_inflation_rate=monthly_rate(yearly_inflation_rate),
         )
         self._names = _assign_names(components)
         self._components = components
@@ -219,6 +217,7 @@ class FinancialModel:
                 ],
                 invested_capital=invested_capital,
                 monthly_leftover=None,
+                monthly_invested=None,
                 safe_withdrawal_rate=params.safe_withdrawal_rate,
             )
         ]
@@ -228,6 +227,7 @@ class FinancialModel:
             for component, state in zip(components, states):
                 component.year_begin(state, year_ctx)
             year_leftover = 0.0
+            year_invested = 0.0
 
             for month in range(1, 13):
                 month_ctx = MonthContext(params, year, month)
@@ -256,16 +256,20 @@ class FinancialModel:
                     remainder -= claimed
 
                 # (c2) the portfolios take their share; the sink takes the rest
+                invested = remainder
                 for index, (component, state) in enumerate(zip(components, states)):
                     if component.absorbs_cash:
-                        component.absorb(
-                            state,
-                            month_ctx,
-                            remainder if index == self._sink_index else claims[index],
-                        )
+                        if index == self._sink_index:
+                            component.absorb(state, month_ctx, remainder)
+                        else:
+                            component.absorb(state, month_ctx, claims[index])
+                            invested += claims[index]
 
-                # (d) the leftover is counted *before* the claims, as it always was
+                # (d) the leftover is counted *before* the claims, as it always was;
+                # `invested` is what actually reached the portfolios, so the two
+                # differ by whatever the Sondertilgung reserve withheld.
                 year_leftover += leftover
+                year_invested += invested
                 invested_capital += leftover
 
                 # (e) monthly escalation
@@ -278,6 +282,9 @@ class FinancialModel:
             for amount in year_ctx.released:
                 if amount > 0:
                     sink.credit_untaxed(sink_state, amount)
+                    # It was withheld from the surplus during the year but the
+                    # principal could not use it, so it did end up invested.
+                    year_invested += amount
 
             # (B) the yearly withdrawal
             for component, state in zip(components, states):
@@ -294,6 +301,7 @@ class FinancialModel:
                     ],
                     invested_capital=invested_capital,
                     monthly_leftover=year_leftover / 12.0,
+                    monthly_invested=year_invested / 12.0,
                     safe_withdrawal_rate=params.safe_withdrawal_rate,
                 )
             )

@@ -19,23 +19,23 @@ Investment Property Model - First 5 years:
 4    79491.155200           92573.006420            220251.317355   
 5    97613.178304          117749.452779            267817.162845   
 
-   invested_capital  monthly_income  ...  monthly_interest_payment  \
-0     100000.000000          2000.0  ...                  0.000000   
-1     116935.000000          2000.0  ...               1273.589076   
-2     134158.000000          2000.0  ...               1253.668385   
-3     151674.760000          2000.0  ...               1232.977384   
-4     169491.155200          2000.0  ...               1211.486285   
-5     187613.178304          2000.0  ...               1189.164150   
+   invested_capital  monthly_income  ...  monthly_loan_repayment  \
+0     100000.000000          2000.0  ...                0.000000   
+1     116935.000000          2000.0  ...              515.160924   
+2     134158.000000          2000.0  ...              535.081615   
+3     151674.760000          2000.0  ...              555.772616   
+4     169491.155200          2000.0  ...              577.263715   
+5     187613.178304          2000.0  ...              599.585850   
 
-   monthly_loan_repayment  monthly_mortgage_payment  monthly_housing_cost  \
-0                0.000000                   1788.75               1788.75   
-1              515.160924                   1788.75               1788.75   
-2              535.081615                   1788.75               1788.75   
-3              555.772616                   1788.75               1788.75   
-4              577.263715                   1788.75               1788.75   
-5              599.585850                   1788.75               1788.75   
+   monthly_mortgage_payment  monthly_housing_cost  monthly_leftover  \
+0                   1788.75               1788.75       1411.250000   
+1                   1788.75               1788.75       1411.250000   
+2                   1788.75               1788.75       1435.250000   
+3                   1788.75               1788.75       1459.730000   
+4                   1788.75               1788.75       1484.699600   
+5                   1788.75               1788.75       1510.168592   
 
-   monthly_leftover  yearly_sondertilgung  cumulative_interest_paid  \
+   monthly_invested  yearly_sondertilgung  cumulative_interest_paid  \
 0       1411.250000                   0.0                  0.000000   
 1       1411.250000                   0.0              15283.068908   
 2       1435.250000                   0.0              30327.089531   
@@ -59,7 +59,7 @@ Investment Property Model - First 5 years:
 4                                   1557.317484  
 5                                   1494.376368  
 
-[6 rows x 23 columns]
+[6 rows x 24 columns]
 [text/html]
 <div>
 <style scoped>
@@ -90,11 +90,11 @@ Investment Property Model - First 5 years:
       <th>invested_capital</th>
       <th>monthly_income</th>
       <th>...</th>
-      <th>monthly_interest_payment</th>
       <th>monthly_loan_repayment</th>
       <th>monthly_mortgage_payment</th>
       <th>monthly_housing_cost</th>
       <th>monthly_leftover</th>
+      <th>monthly_invested</th>
       <th>yearly_sondertilgung</th>
       <th>cumulative_interest_paid</th>
       <th>yearly_etf_withdrawal_gross</th>
@@ -117,9 +117,9 @@ Investment Property Model - First 5 years:
       <td>2000.0</td>
       <td>...</td>
       <td>0.000000</td>
-      <td>0.000000</td>
       <td>1788.75</td>
       <td>1788.75</td>
+      <td>1411.250000</td>
       <td>1411.250000</td>
       <td>0.0</td>
       <td>0.000000</td>
@@ -140,10 +140,10 @@ Investment Property Model - First 5 years:
       <td>116935.000000</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>1273.589076</td>
       <td>515.160924</td>
       <td>1788.75</td>
       <td>1788.75</td>
+      <td>1411.250000</td>
       <td>1411.250000</td>
       <td>0.0</td>
       <td>15283.068908</td>
@@ -164,10 +164,10 @@ Investment Property Model - First 5 years:
       <td>134158.000000</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>1253.668385</td>
       <td>535.081615</td>
       <td>1788.75</td>
       <td>1788.75</td>
+      <td>1435.250000</td>
       <td>1435.250000</td>
       <td>0.0</td>
       <td>30327.089531</td>
@@ -188,10 +188,10 @@ Investment Property Model - First 5 years:
       <td>151674.760000</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>1232.977384</td>
       <td>555.772616</td>
       <td>1788.75</td>
       <td>1788.75</td>
+      <td>1459.730000</td>
       <td>1459.730000</td>
       <td>0.0</td>
       <td>45122.818140</td>
@@ -212,10 +212,10 @@ Investment Property Model - First 5 years:
       <td>169491.155200</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>1211.486285</td>
       <td>577.263715</td>
       <td>1788.75</td>
       <td>1788.75</td>
+      <td>1484.699600</td>
       <td>1484.699600</td>
       <td>0.0</td>
       <td>59660.653565</td>
@@ -236,10 +236,10 @@ Investment Property Model - First 5 years:
       <td>187613.178304</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>1189.164150</td>
       <td>599.585850</td>
       <td>1788.75</td>
       <td>1788.75</td>
+      <td>1510.168592</td>
       <td>1510.168592</td>
       <td>0.0</td>
       <td>73930.623369</td>
@@ -249,7 +249,7 @@ Investment Property Model - First 5 years:
     </tr>
   </tbody>
 </table>
-<p>6 rows × 23 columns</p>
+<p>6 rows × 24 columns</p>
 </div>
 ===== cell 5 =====
 [stdout]
@@ -270,21 +270,21 @@ Investment Property Model - Last 5 years:
 29   745181.027670           2.076048e+06             2.909119e+06   
 30   780395.160407           2.257701e+06             3.128405e+06   
 
-    invested_capital  monthly_income  ...  monthly_interest_payment  \
-26     732507.985403          2000.0  ...                779.928262   
-27     766247.175446          2000.0  ...                763.819805   
-28     800468.309905          2000.0  ...                747.088452   
-29     835181.027670          2000.0  ...                729.710116   
-30     870395.160407          2000.0  ...                711.659780   
+    invested_capital  monthly_income  ...  monthly_loan_repayment  \
+26     732507.985403          2000.0  ...              416.574305   
+27     766247.175446          2000.0  ...              432.682762   
+28     800468.309905          2000.0  ...              449.414115   
+29     835181.027670          2000.0  ...              466.792451   
+30     870395.160407          2000.0  ...              484.842787   
 
-    monthly_loan_repayment  monthly_mortgage_payment  monthly_housing_cost  \
-26              416.574305               1196.502567           1196.502567   
-27              432.682762               1196.502567           1196.502567   
-28              449.414115               1196.502567           1196.502567   
-29              466.792451               1196.502567           1196.502567   
-30              484.842787               1196.502567           1196.502567   
+    monthly_mortgage_payment  monthly_housing_cost  monthly_leftover  \
+26               1196.502567           1196.502567       2772.224626   
+27               1196.502567           1196.502567       2811.599170   
+28               1196.502567           1196.502567       2851.761205   
+29               1196.502567           1196.502567       2892.726480   
+30               1196.502567           1196.502567       2934.511061   
 
-    monthly_leftover  yearly_sondertilgung  cumulative_interest_paid  \
+    monthly_invested  yearly_sondertilgung  cumulative_interest_paid  \
 26       2772.224626                   0.0             314922.764729   
 27       2811.599170                   0.0             324088.602387   
 28       2851.761205                   0.0             333053.663808   
@@ -305,7 +305,7 @@ Investment Property Model - Last 5 years:
 29                                  -3993.617359  
 30                                  -4447.751051  
 
-[5 rows x 23 columns]
+[5 rows x 24 columns]
 [text/html]
 <div>
 <style scoped>
@@ -336,11 +336,11 @@ Investment Property Model - Last 5 years:
       <th>invested_capital</th>
       <th>monthly_income</th>
       <th>...</th>
-      <th>monthly_interest_payment</th>
       <th>monthly_loan_repayment</th>
       <th>monthly_mortgage_payment</th>
       <th>monthly_housing_cost</th>
       <th>monthly_leftover</th>
+      <th>monthly_invested</th>
       <th>yearly_sondertilgung</th>
       <th>cumulative_interest_paid</th>
       <th>yearly_etf_withdrawal_gross</th>
@@ -362,10 +362,10 @@ Investment Property Model - Last 5 years:
       <td>732507.985403</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>779.928262</td>
       <td>416.574305</td>
       <td>1196.502567</td>
       <td>1196.502567</td>
+      <td>2772.224626</td>
       <td>2772.224626</td>
       <td>0.0</td>
       <td>314922.764729</td>
@@ -386,10 +386,10 @@ Investment Property Model - Last 5 years:
       <td>766247.175446</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>763.819805</td>
       <td>432.682762</td>
       <td>1196.502567</td>
       <td>1196.502567</td>
+      <td>2811.599170</td>
       <td>2811.599170</td>
       <td>0.0</td>
       <td>324088.602387</td>
@@ -410,10 +410,10 @@ Investment Property Model - Last 5 years:
       <td>800468.309905</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>747.088452</td>
       <td>449.414115</td>
       <td>1196.502567</td>
       <td>1196.502567</td>
+      <td>2851.761205</td>
       <td>2851.761205</td>
       <td>0.0</td>
       <td>333053.663808</td>
@@ -434,10 +434,10 @@ Investment Property Model - Last 5 years:
       <td>835181.027670</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>729.710116</td>
       <td>466.792451</td>
       <td>1196.502567</td>
       <td>1196.502567</td>
+      <td>2892.726480</td>
       <td>2892.726480</td>
       <td>0.0</td>
       <td>341810.185199</td>
@@ -458,10 +458,10 @@ Investment Property Model - Last 5 years:
       <td>870395.160407</td>
       <td>2000.0</td>
       <td>...</td>
-      <td>711.659780</td>
       <td>484.842787</td>
       <td>1196.502567</td>
       <td>1196.502567</td>
+      <td>2934.511061</td>
       <td>2934.511061</td>
       <td>0.0</td>
       <td>350350.102555</td>
@@ -471,7 +471,7 @@ Investment Property Model - Last 5 years:
     </tr>
   </tbody>
 </table>
-<p>5 rows × 23 columns</p>
+<p>5 rows × 24 columns</p>
 </div>
 ===== cell 6 =====
 [stdout]
@@ -494,23 +494,23 @@ ETF Only Model - First 5 years:
 4        196000.0          241015.228298            241015.228298   
 5        220000.0          282646.888570            282646.888570   
 
-   invested_capital  monthly_income  ...  monthly_interest_payment  \
-0          100000.0          2000.0  ...                       0.0   
-1          124000.0          2000.0  ...                       0.0   
-2          148000.0          2000.0  ...                       0.0   
-3          172000.0          2000.0  ...                       0.0   
-4          196000.0          2000.0  ...                       0.0   
-5          220000.0          2000.0  ...                       0.0   
+   invested_capital  monthly_income  ...  monthly_loan_repayment  \
+0          100000.0          2000.0  ...                     0.0   
+1          124000.0          2000.0  ...                     0.0   
+2          148000.0          2000.0  ...                     0.0   
+3          172000.0          2000.0  ...                     0.0   
+4          196000.0          2000.0  ...                     0.0   
+5          220000.0          2000.0  ...                     0.0   
 
-   monthly_loan_repayment  monthly_mortgage_payment  monthly_housing_cost  \
-0                     0.0                       0.0                   0.0   
-1                     0.0                       0.0                   0.0   
-2                     0.0                       0.0                   0.0   
-3                     0.0                       0.0                   0.0   
-4                     0.0                       0.0                   0.0   
-5                     0.0                       0.0                   0.0   
+   monthly_mortgage_payment  monthly_housing_cost  monthly_leftover  \
+0                       0.0                   0.0            2000.0   
+1                       0.0                   0.0            2000.0   
+2                       0.0                   0.0            2000.0   
+3                       0.0                   0.0            2000.0   
+4                       0.0                   0.0            2000.0   
+5                       0.0                   0.0            2000.0   
 
-   monthly_leftover  yearly_sondertilgung  cumulative_interest_paid  \
+   monthly_invested  yearly_sondertilgung  cumulative_interest_paid  \
 0            2000.0                   0.0                       0.0   
 1            2000.0                   0.0                       0.0   
 2            2000.0                   0.0                       0.0   
@@ -534,7 +534,7 @@ ETF Only Model - First 5 years:
 4                                   -602.538071  
 5                                   -706.617221  
 
-[6 rows x 23 columns]
+[6 rows x 24 columns]
 [text/html]
 <div>
 <style scoped>
@@ -565,11 +565,11 @@ ETF Only Model - First 5 years:
       <th>invested_capital</th>
       <th>monthly_income</th>
       <th>...</th>
-      <th>monthly_interest_payment</th>
       <th>monthly_loan_repayment</th>
       <th>monthly_mortgage_payment</th>
       <th>monthly_housing_cost</th>
       <th>monthly_leftover</th>
+      <th>monthly_invested</th>
       <th>yearly_sondertilgung</th>
       <th>cumulative_interest_paid</th>
       <th>yearly_etf_withdrawal_gross</th>
@@ -594,7 +594,7 @@ ETF Only Model - First 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -618,7 +618,7 @@ ETF Only Model - First 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -642,7 +642,7 @@ ETF Only Model - First 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -666,7 +666,7 @@ ETF Only Model - First 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -690,7 +690,7 @@ ETF Only Model - First 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -714,7 +714,7 @@ ETF Only Model - First 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -724,7 +724,7 @@ ETF Only Model - First 5 years:
     </tr>
   </tbody>
 </table>
-<p>6 rows × 23 columns</p>
+<p>6 rows × 24 columns</p>
 </div>
 ===== cell 7 =====
 [stdout]
@@ -745,21 +745,21 @@ ETF Only Model - Last 5 years:
 29        796000.0           2.874178e+06             2.874178e+06   
 30        820000.0           3.100131e+06             3.100131e+06   
 
-    invested_capital  monthly_income  ...  monthly_interest_payment  \
-26          724000.0          2000.0  ...                       0.0   
-27          748000.0          2000.0  ...                       0.0   
-28          772000.0          2000.0  ...                       0.0   
-29          796000.0          2000.0  ...                       0.0   
-30          820000.0          2000.0  ...                       0.0   
+    invested_capital  monthly_income  ...  monthly_loan_repayment  \
+26          724000.0          2000.0  ...                     0.0   
+27          748000.0          2000.0  ...                     0.0   
+28          772000.0          2000.0  ...                     0.0   
+29          796000.0          2000.0  ...                     0.0   
+30          820000.0          2000.0  ...                     0.0   
 
-    monthly_loan_repayment  monthly_mortgage_payment  monthly_housing_cost  \
-26                     0.0                       0.0                   0.0   
-27                     0.0                       0.0                   0.0   
-28                     0.0                       0.0                   0.0   
-29                     0.0                       0.0                   0.0   
-30                     0.0                       0.0                   0.0   
+    monthly_mortgage_payment  monthly_housing_cost  monthly_leftover  \
+26                       0.0                   0.0            2000.0   
+27                       0.0                   0.0            2000.0   
+28                       0.0                   0.0            2000.0   
+29                       0.0                   0.0            2000.0   
+30                       0.0                   0.0            2000.0   
 
-    monthly_leftover  yearly_sondertilgung  cumulative_interest_paid  \
+    monthly_invested  yearly_sondertilgung  cumulative_interest_paid  \
 26            2000.0                   0.0                       0.0   
 27            2000.0                   0.0                       0.0   
 28            2000.0                   0.0                       0.0   
@@ -780,7 +780,7 @@ ETF Only Model - Last 5 years:
 29                                  -7185.444198  
 30                                  -7750.326777  
 
-[5 rows x 23 columns]
+[5 rows x 24 columns]
 [text/html]
 <div>
 <style scoped>
@@ -811,11 +811,11 @@ ETF Only Model - Last 5 years:
       <th>invested_capital</th>
       <th>monthly_income</th>
       <th>...</th>
-      <th>monthly_interest_payment</th>
       <th>monthly_loan_repayment</th>
       <th>monthly_mortgage_payment</th>
       <th>monthly_housing_cost</th>
       <th>monthly_leftover</th>
+      <th>monthly_invested</th>
       <th>yearly_sondertilgung</th>
       <th>cumulative_interest_paid</th>
       <th>yearly_etf_withdrawal_gross</th>
@@ -840,7 +840,7 @@ ETF Only Model - Last 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -864,7 +864,7 @@ ETF Only Model - Last 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -888,7 +888,7 @@ ETF Only Model - Last 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -912,7 +912,7 @@ ETF Only Model - Last 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -936,7 +936,7 @@ ETF Only Model - Last 5 years:
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.0</td>
+      <td>2000.0</td>
       <td>2000.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -946,7 +946,7 @@ ETF Only Model - Last 5 years:
     </tr>
   </tbody>
 </table>
-<p>5 rows × 23 columns</p>
+<p>5 rows × 24 columns</p>
 </div>
 ===== cell 9 =====
 [text/plain]

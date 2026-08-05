@@ -262,6 +262,10 @@ class TestColumns:
             base.run(), aged.run().drop(columns=["age"]), check_exact=True
         )
 
+    def test_monthly_invested_sits_next_to_monthly_leftover(self):
+        columns = list(FLAT_COLUMNS)
+        assert columns[columns.index("monthly_leftover") + 1] == "monthly_invested"
+
     def test_missing_kinds_report_zero(self):
         """A model without property or spending still reports those columns."""
         df = FinancialModel([Etf(initial_capital=1_000)], years=2).run()

@@ -56,6 +56,7 @@ FLAT_COLUMNS: tuple[str, ...] = (
     "monthly_mortgage_payment",
     "monthly_housing_cost",
     "monthly_leftover",
+    "monthly_invested",
     "yearly_sondertilgung",
     "cumulative_interest_paid",
     "yearly_etf_withdrawal_gross",
@@ -82,14 +83,21 @@ def build_row(
     sources: list[ReportSource],
     invested_capital: float,
     monthly_leftover: float | None,
+    monthly_invested: float | None,
     safe_withdrawal_rate: float,
 ) -> dict[str, float]:
     """Assemble one forecast row.
 
     `monthly_leftover=None` marks the year-0 row, where the leftover is derived
-    from the components' initial values rather than averaged over 12 months —
-    and, matching the pre-refactoring model, does *not* have the Sondertilgung
-    reserve taken off it.
+    from the components' initial values rather than averaged over 12 months.
+
+    `monthly_leftover` is the household's surplus *before* anything is withheld
+    from it; `monthly_invested` is the part that reached the portfolios. The
+    gap is exactly `yearly_sondertilgung / 12` — the money the principal took.
+    A reserve that is withheld but that the loan cannot absorb is handed back
+    to the sink at year end, so it counts as invested, which is why the gap
+    tracks what was *applied* rather than what was withheld. At year 0 no month
+    has run yet and the two are equal.
     """
     row: dict[str, float] = {"year": year}
     if start_age is not None:
@@ -114,6 +122,9 @@ def build_row(
         )
     else:
         row["monthly_leftover"] = monthly_leftover
+    row["monthly_invested"] = (
+        row["monthly_leftover"] if monthly_invested is None else monthly_invested
+    )
     row["monthly_costs_not_covered_by_safe_withdrawal"] = (
         row["monthly_spending"] + row["monthly_housing_cost"]
     ) - row["etf_capital_after_tax"] * safe_withdrawal_rate / 12.0

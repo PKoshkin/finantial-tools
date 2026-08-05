@@ -37,8 +37,15 @@ Model semantics — the details that decide what the numbers mean:
 
 - Monthly simulation, yearly reporting. Portfolios compound monthly:
   `capital = capital * (1 + r_m) + contribution`, i.e. growth comes first.
-  Monthly rates are geometric, `(1 + yearly) ** (1/12) - 1`, except mortgage
-  interest, which is a plain `rate / 12`.
+- Every yearly rate names how it becomes a monthly one, via `Compounding`.
+  A mortgage's Sollzins is `NOMINAL` (`rate / 12` a month, so 3.8% a year
+  accrues to 3.867% effective — the loan the bank actually sells); a quoted
+  market return or inflation figure is `EFFECTIVE` (`(1 + rate) ** (1/12) - 1`,
+  so twelve months reproduce it exactly). Both are overridable per component;
+  the defaults are the conventions every pinned figure was computed with.
+- Yearly escalations — salary raises, rent increases, property appreciation —
+  are applied once a year and never converted to a monthly rate, so no
+  compounding convention applies to them.
 - Row 0 is the state immediately after the t=0 purchases: the loan is
   outstanding, the down payment has become property equity, the purchase fees
   are already sunk.
@@ -58,6 +65,12 @@ Model semantics — the details that decide what the numbers mean:
   once a year, after the row for that year has been emitted.
 - Monthly flow columns (interest, repayment, leftover, spending, ...) are
   averages over the 12 months of that year.
+- `monthly_leftover` is the household surplus before anything is withheld from
+  it; `monthly_invested` is the part that reached the portfolios. The gap is
+  exactly `yearly_sondertilgung / 12`, the money the principal took — so a plan
+  can show a healthy leftover while the portfolio shrinks. A reserve the loan
+  could not absorb comes back to the sink at year end and counts as invested.
+  At year 0 no month has run yet and the two are equal.
 - The sink may go NEGATIVE when the cash flow cannot fund the plan: the
   uncovered deficit keeps compounding at the portfolio's rate, i.e. an implicit
   loan. Check feasibility (e.g. `(df.etf_capital < 0).any()`) before trusting a
@@ -69,6 +82,7 @@ from .component import (
     CashDraw,
     CashFlow,
     CashPhase,
+    Compounding,
     FinancialComponent,
     ModelParams,
     MonthContext,
@@ -100,6 +114,7 @@ __all__ = [
     "CashDraw",
     "CashFlow",
     "CashPhase",
+    "Compounding",
     "Etf",
     "FinancialComponent",
     "FinancialModel",

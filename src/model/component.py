@@ -18,6 +18,49 @@ from enum import Enum, IntEnum, auto
 from typing import Any, ClassVar, Sequence
 
 
+class Compounding(Enum):
+    """How a yearly rate is turned into a monthly one.
+
+    The two conventions coexist in this model on purpose, because that is how
+    the underlying figures are quoted in the real world:
+
+    - `NOMINAL` — the yearly figure is a nominal rate with monthly accrual, so
+      one month costs `rate / 12` and the *effective* year is slightly more
+      (3.8% nominal accrues to 3.867% effective). A German mortgage's Sollzins
+      works exactly like this, which is why `Mortgage` defaults to it.
+    - `EFFECTIVE` — the yearly figure already is the effective annual figure,
+      so one month is `(1 + rate) ** (1/12) - 1` and twelve of them reproduce it
+      exactly. A quoted "7% a year" market return or "2% inflation" is this,
+      which is why `Etf` and `Spending` default to it.
+
+    Both members are available everywhere, but the defaults above are the ones
+    the pinned fixtures were computed with. Overriding is a deliberate change
+    of assumption: `NOMINAL` on a portfolio makes "7% a year" grow at 7.229%,
+    and `EFFECTIVE` on a mortgage makes the loan cheaper than the one the bank
+    is actually selling.
+    """
+
+    NOMINAL = auto()
+    EFFECTIVE = auto()
+
+    def monthly_charge(self, balance: float, yearly_rate: float) -> float:
+        """Interest accrued on `balance` over one month.
+
+        Written as a charge rather than a rate so the nominal case keeps the
+        literal `balance * rate / 12.0` chain — factoring out `rate / 12` first
+        changes the result for about a third of realistic inputs.
+        """
+        if self is Compounding.NOMINAL:
+            return balance * yearly_rate / 12.0
+        return balance * ((1.0 + yearly_rate) ** (1.0 / 12.0) - 1.0)
+
+    def monthly_rate(self, yearly_rate: float) -> float:
+        """The growth rate applied once per month."""
+        if self is Compounding.NOMINAL:
+            return yearly_rate / 12.0
+        return (1.0 + yearly_rate) ** (1.0 / 12.0) - 1.0
+
+
 class CashPhase(IntEnum):
     """Order in which monthly cash flows are summed.
 
@@ -60,13 +103,16 @@ class Cardinality(Enum):
 
 @dataclass(frozen=True, slots=True)
 class ModelParams:
-    """Parameters shared by every component."""
+    """Parameters shared by every component.
+
+    The inflation rate is handed over as a yearly figure: it is the component
+    that decides how to compound it (see `Compounding`), not the model.
+    """
 
     years: int
     start_age: int | None
     yearly_inflation_rate: float
     safe_withdrawal_rate: float
-    monthly_inflation_rate: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -178,13 +224,9 @@ class FinancialComponent:
         """Stage (F): recompute the annuity at the end of a Zinsbindung."""
 
 
-def monthly_rate(yearly_rate: float) -> float:
-    """Geometric monthly equivalent of a yearly rate.
-
-    Used for ETF returns and inflation. Mortgage interest deliberately does
-    *not* go through this — it uses a plain `rate / 12`, as it always has.
-    """
-    return (1.0 + yearly_rate) ** (1.0 / 12.0) - 1.0
+def check_compounding(value: Any, name: str = "compounding") -> None:
+    if not isinstance(value, Compounding):
+        raise TypeError(f"{name} must be a Compounding member")
 
 
 def check_amount(value: Any, name: str) -> None:

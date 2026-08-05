@@ -62,19 +62,53 @@ df = model.run()
 | Component | How many | Parameters |
 |---|---|---|
 | `Salary` | any | `monthly_amount`, `yearly_increase_rate` |
-| `Spending` | any | `monthly_amount`, `yearly_increase_rate` (`None` → the model's inflation) |
+| `Spending` | any | `monthly_amount`, `yearly_increase_rate` (`None` → the model's inflation), `compounding` |
 | `Rent` — your own housing | 0 or 1 | `monthly_amount`, `yearly_increase_rate` |
 | `Home` — the place you live in | 0 or 1 | `price`, `yearly_price_increase_rate`, `mortgage` |
 | `InvestmentProperty` — bought to rent out | any | the above plus `monthly_rental_income`, `yearly_rental_income_increase_rate` |
-| `Etf` — a portfolio | any | `initial_capital`, `yearly_return_rate`, `tax_rate`, `monthly_investment`, `yearly_withdrawal_rate` |
+| `Etf` — a portfolio | any | `initial_capital`, `yearly_return_rate`, `tax_rate`, `monthly_investment`, `yearly_withdrawal_rate`, `compounding` |
+
+Every component also takes a `name`, which prefixes its own result columns.
 
 `Mortgage` is not a component but a value object nested in a property
 (`interest_rate`, `down_payment_rate`, `fees_rate`, `yearly_repayment_rate`,
-`refinancing_years`, `sondertilgung_yearly_rate`), because a loan here always
-belongs to one property and is derived from its price.
+`refinancing_years`, `sondertilgung_yearly_rate`, `compounding`), because a loan
+here always belongs to one property and is derived from its price.
 
 Rates of return are per component: two portfolios can grow at different rates
 and be taxed differently.
+
+### How a yearly rate becomes a monthly one
+
+Every yearly rate that the simulation needs monthly says which convention it is
+quoted in, via `Compounding` — the two coexist because that is how the real
+figures are quoted:
+
+| | monthly | 3.8% a year works out to | default for |
+|---|---|---|---|
+| `NOMINAL` | `rate / 12` | 3.867% effective | `Mortgage` — a Sollzins accrues monthly, which is the loan the bank sells |
+| `EFFECTIVE` | `(1 + rate) ** (1/12) - 1` | 3.800% effective | `Etf`, `Spending` — a quoted return or inflation figure already is the annual figure |
+
+```python
+Mortgage(interest_rate=0.038, compounding=Compounding.NOMINAL)    # default
+Etf(yearly_return_rate=0.07, compounding=Compounding.EFFECTIVE)   # default
+```
+
+A mortgage's convention also splits the annuity, so that `yearly_repayment_rate`
+always means the share of the loan repaid in the first year: the payment is the
+month's interest plus `loan * yearly_repayment_rate / 12`, which for the nominal
+default is the familiar `loan * (interest_rate + yearly_repayment_rate) / 12`.
+
+The defaults are the conventions every pinned figure was computed with, so
+overriding one deliberately moves the numbers. On the 30-year model above:
+switching the mortgage to `EFFECTIVE` cuts total interest from €110.1k to
+€108.5k and leaves more principal outstanding (the annuity shrinks with the
+interest); switching the portfolio to `NOMINAL` turns "7% a year" into 7.229%
+and lifts final wealth from €2.617m to €2.643m.
+
+Yearly escalations — salary raises, rent increases, property appreciation — are
+applied once a year and never converted to a monthly rate, so no convention
+applies to them.
 
 ### Where the money goes
 
@@ -115,6 +149,18 @@ after the t=0 purchases) and two kinds of columns:
 
 `flat(df)` drops the per-component block when you only want to look at the
 totals.
+
+Two of those totals are easy to confuse. `monthly_leftover` is the household
+surplus **before** anything is withheld from it; `monthly_invested` is the part
+that reached the portfolios. The gap is exactly `yearly_sondertilgung / 12` —
+the money the principal took — so a plan can report a comfortable leftover
+while the portfolio is being drained:
+
+```
+year  monthly_leftover  monthly_invested   # 5% Sondertilgung
+   1           1192.98           -494.52
+   2           1252.62           -434.88
+```
 
 Model semantics — year-0 row, tax and cost-basis treatment, the Sondertilgung
 reserve, withdrawal ordering — are documented in the module docstring of

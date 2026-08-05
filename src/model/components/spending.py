@@ -9,13 +9,14 @@ from ..component import (
     Cardinality,
     CashFlow,
     CashPhase,
+    Compounding,
     FinancialComponent,
     MonthContext,
     SetupContext,
     YearContext,
     check_amount,
+    check_compounding,
     check_growth_rate,
-    monthly_rate,
 )
 
 
@@ -33,6 +34,10 @@ class Spending(FinancialComponent):
     Unlike income and rent this grows every month rather than once a year,
     which is why the reported `monthly_spending` is the 12-month average.
     `yearly_increase_rate=None` means "follow the model's inflation".
+
+    `compounding` says how that yearly figure becomes a monthly one. An
+    inflation figure is an effective annual one, so the default is
+    `EFFECTIVE`: twelve monthly steps reproduce it exactly.
     """
 
     default_name = "spending"
@@ -41,20 +46,25 @@ class Spending(FinancialComponent):
 
     monthly_amount: float = 0.0
     yearly_increase_rate: float | None = None
+    compounding: Compounding = Compounding.EFFECTIVE
     name: str | None = None
 
     def __post_init__(self) -> None:
         check_amount(self.monthly_amount, "monthly_amount")
         if self.yearly_increase_rate is not None:
             check_growth_rate(self.yearly_increase_rate, "yearly_increase_rate")
+        check_compounding(self.compounding)
 
     def open(self, ctx: SetupContext) -> SpendingState:
-        rate = (
-            ctx.params.monthly_inflation_rate
+        yearly = (
+            ctx.params.yearly_inflation_rate
             if self.yearly_increase_rate is None
-            else monthly_rate(self.yearly_increase_rate)
+            else self.yearly_increase_rate
         )
-        return SpendingState(monthly_amount=self.monthly_amount, monthly_rate=rate)
+        return SpendingState(
+            monthly_amount=self.monthly_amount,
+            monthly_rate=self.compounding.monthly_rate(yearly),
+        )
 
     def year_begin(self, state: SpendingState, ctx: YearContext) -> None:
         state.year_amount = 0.0

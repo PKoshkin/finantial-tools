@@ -7,13 +7,14 @@ from typing import Any
 
 from ..component import (
     Cardinality,
+    Compounding,
     FinancialComponent,
     MonthContext,
     SetupContext,
     YearContext,
     check_amount,
+    check_compounding,
     check_growth_rate,
-    monthly_rate,
 )
 
 
@@ -64,6 +65,10 @@ class Etf(FinancialComponent):
 
     Give `monthly_investment` a number instead to contribute a fixed amount;
     such a portfolio is funded out of the leftover before the sink sees it.
+
+    `compounding` says how the yearly return becomes a monthly one. A quoted
+    annual return is an effective annual figure, so the default is `EFFECTIVE`:
+    "7% a year" compounds to exactly 7% over twelve months.
     """
 
     default_name = "etf"
@@ -76,6 +81,7 @@ class Etf(FinancialComponent):
     tax_rate: float = 0.0  # capital gains tax, e.g. Abgeltungssteuer
     monthly_investment: Any = REMAINDER
     yearly_withdrawal_rate: float = 0.0
+    compounding: Compounding = Compounding.EFFECTIVE
     name: str | None = None
 
     def __post_init__(self) -> None:
@@ -88,6 +94,7 @@ class Etf(FinancialComponent):
             raise ValueError("yearly_withdrawal_rate must be within [0, 1]")
         if self.monthly_investment is not REMAINDER:
             check_amount(self.monthly_investment, "monthly_investment")
+        check_compounding(self.compounding)
 
     @classmethod
     def cash(cls, initial_capital: float = 0.0, **kwargs: Any) -> "Etf":
@@ -103,7 +110,7 @@ class Etf(FinancialComponent):
         return EtfState(
             capital=self.initial_capital,
             cost_basis=max(self.initial_capital, 0.0),
-            monthly_rate=monthly_rate(self.yearly_return_rate),
+            monthly_rate=self.compounding.monthly_rate(self.yearly_return_rate),
         )
 
     def initial_cash(self, state: EtfState) -> float:

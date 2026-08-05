@@ -15,11 +15,13 @@ from ..component import (
     CashDraw,
     CashFlow,
     CashPhase,
+    Compounding,
     FinancialComponent,
     MonthContext,
     SetupContext,
     YearContext,
     check_amount,
+    check_compounding,
     check_growth_rate,
 )
 
@@ -31,6 +33,15 @@ class Mortgage:
     The payment is recomputed from the outstanding principal every
     `refinancing_years` (the end of a Zinsbindung), and stops entirely once the
     loan is repaid.
+
+    `compounding` says how `interest_rate` accrues month to month. A Sollzins
+    is a nominal rate with monthly accrual, so the default is `NOMINAL`: 3.8%
+    a year costs 3.8%/12 a month and works out to 3.867% effective, which is
+    the loan the bank is actually selling. It also decides how the annuity is
+    split, so that `yearly_repayment_rate` always means what it says: the
+    payment is the month's interest plus `loan * yearly_repayment_rate / 12`
+    of principal, which for the nominal default is the familiar
+    `loan * (interest_rate + yearly_repayment_rate) / 12`.
     """
 
     interest_rate: float = 0.0
@@ -39,6 +50,7 @@ class Mortgage:
     yearly_repayment_rate: float = 0.0  # initial Tilgung
     refinancing_years: int = 0  # 0 -> the annuity is never recomputed
     sondertilgung_yearly_rate: float = 0.0  # % of the ORIGINAL loan per year
+    compounding: Compounding = Compounding.NOMINAL
 
     def __post_init__(self) -> None:
         if not isinstance(self.refinancing_years, int) or isinstance(
@@ -57,12 +69,24 @@ class Mortgage:
             raise ValueError("refinancing_years must be >= 0")
         if not 0.0 <= self.down_payment_rate <= 1.0:
             raise ValueError("down_payment_rate must be within [0, 1]")
+        check_compounding(self.compounding)
 
     def annuity_payment(self, loan: float) -> float:
-        """Monthly payment servicing `loan` at this mortgage's rates."""
+        """Monthly payment servicing `loan` at this mortgage's rates.
+
+        Interest plus the initial Tilgung. The nominal branch is written as the
+        single expression the pinned figures were computed with — splitting it
+        into two terms would change the last bits.
+        """
         if loan <= 0:
             return 0.0
-        return loan * (self.interest_rate + self.yearly_repayment_rate) / 12.0
+        if self.compounding is Compounding.NOMINAL:
+            return loan * (self.interest_rate + self.yearly_repayment_rate) / 12.0
+        return self.monthly_interest(loan) + loan * self.yearly_repayment_rate / 12.0
+
+    def monthly_interest(self, loan: float) -> float:
+        """Interest accrued on `loan` over one month."""
+        return self.compounding.monthly_charge(loan, self.interest_rate)
 
 
 @dataclass(slots=True)
@@ -175,7 +199,7 @@ class _PropertyBase(FinancialComponent):
 
     def month_begin(self, state: PropertyState, ctx: MonthContext) -> None:
         if self.mortgage is not None and state.loan > 0:
-            interest = state.loan * self.mortgage.interest_rate / 12.0
+            interest = self.mortgage.monthly_interest(state.loan)
             principal = min(state.payment - interest, state.loan)
             payment = interest + principal
             state.loan -= principal

@@ -3,6 +3,7 @@
 import pytest
 from src.model import (
     REMAINDER,
+    Compounding,
     Etf,
     FinancialModel,
     Home,
@@ -62,6 +63,18 @@ class TestComponentValidation:
     def test_mortgage_must_be_a_mortgage(self):
         with pytest.raises(TypeError, match="mortgage"):
             Home(price=100_000, mortgage="none")
+
+    def test_compounding_must_be_a_member_of_the_enum(self):
+        for build in (
+            lambda value: Etf(compounding=value),
+            lambda value: Mortgage(compounding=value),
+            lambda value: Spending(compounding=value),
+        ):
+            for bad in ("effective", 1, None):
+                with pytest.raises(TypeError, match="compounding"):
+                    build(bad)
+            build(Compounding.NOMINAL)
+            build(Compounding.EFFECTIVE)
 
     def test_spending_may_override_inflation(self):
         assert Spending(monthly_amount=100).yearly_increase_rate is None
