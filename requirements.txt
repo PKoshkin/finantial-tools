@@ -1,2 +1,7 @@
 pandas
 matplotlib
+pytest
+# notebook execution
+ipykernel
+nbformat
+nbclient
