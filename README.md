@@ -62,10 +62,11 @@ df = model.run()
 | Component | How many | Parameters |
 |---|---|---|
 | `Salary` | any | `monthly_amount`, `yearly_increase_rate` |
+| `GermanHousehold` — gross salaries under German taxation | 0 or 1 | `earners` (1-2 × `Earner`), `joint`, `tax_classes`, `n_children`, `tax` (a `TaxSystem`) |
 | `Spending` | any | `monthly_amount`, `yearly_increase_rate` (`None` → the model's inflation), `compounding` |
 | `Rent` — your own housing | 0 or 1 | `monthly_amount`, `yearly_increase_rate` |
 | `Home` — the place you live in | 0 or 1 | `price`, `yearly_price_increase_rate`, `mortgage` |
-| `InvestmentProperty` — bought to rent out | any | the above plus `monthly_rental_income`, `yearly_rental_income_increase_rate` |
+| `InvestmentProperty` — bought to rent out | any | the above plus `monthly_rental_income`, `yearly_rental_income_increase_rate`, `operating_costs`, `vacancy_rate`, `taxation` |
 | `Etf` — a portfolio | any | `initial_capital`, `yearly_return_rate`, `tax_rate`, `monthly_investment`, `yearly_withdrawal_rate`, `compounding` |
 
 Every component also takes a `name`, which prefixes its own result columns.
@@ -73,10 +74,53 @@ Every component also takes a `name`, which prefixes its own result columns.
 `Mortgage` is not a component but a value object nested in a property
 (`interest_rate`, `down_payment_rate`, `fees_rate`, `yearly_repayment_rate`,
 `refinancing_years`, `sondertilgung_yearly_rate`, `compounding`), because a loan
-here always belongs to one property and is derived from its price.
+here always belongs to one property and is derived from its price. A rental
+flat nests two more value objects the same way: `OperatingCosts` and
+`RentalTaxation` (see below).
 
 Rates of return are per component: two portfolios can grow at different rates
 and be taxed differently.
+
+### Rental taxation
+
+A bare `InvestmentProperty` treats its rent as tax-free cash. Three optional
+parameters model a German buy-to-let properly:
+
+```python
+InvestmentProperty(
+    price=510_000,
+    monthly_rental_income=2_820,            # Nettokaltmiete incl. Stellplatz
+    yearly_rental_income_increase_rate=0.02,
+    yearly_price_increase_rate=0.02,
+    mortgage=Mortgage(interest_rate=0.045, down_payment_rate=0.0,
+                      fees_rate=0.12, yearly_repayment_rate=0.015),
+    operating_costs=OperatingCosts(
+        monthly_deductible=150.0,           # non-recoverable Hausgeld, Grundsteuer, ...
+        monthly_own_reserve=206.0,          # own maintenance reserve: cash, not deductible
+        yearly_increase_rate=0.02,
+    ),
+    vacancy_rate=0.0,                       # share of rent lost to vacancy
+    taxation=RentalTaxation(afa_rate=0.03, building_share=0.96),
+)
+```
+
+With `taxation` set the flat publishes its yearly Einkünfte aus Vermietung und
+Verpachtung — rent minus deductible costs, loan interest and AfA — to the
+model's `GermanHousehold` (required then; the model refuses to build without
+one). The household re-assesses its income tax with that result in the zvE, so
+a rental loss becomes a refund and a profit a back-payment, arriving with the
+July settlement of the *following* year like any other refund. The AfA base is
+`(price + purchase fees) * building_share`, depreciating at `afa_rate` a year.
+
+Deliberate simplifications: umlagefähige Kosten are not modelled (they cancel
+between the Warmmiete and the expenses — the rent here is a Nettokaltmiete);
+a vacancy reduces the collected rent *and* the taxable result, unlike planning
+calculators that book a kalkulatorischer Mietausfall on top of full rent; AfA
+runs flat forever, overstating the deduction beyond `1 / afa_rate` years;
+losses only offset income within their year (no Verlustvortrag); and the final
+year's tax settlement falls beyond the horizon and is dropped — conservative
+for a refund, but for a profitable flat it means the last year's rental tax is
+never charged.
 
 ### How a yearly rate becomes a monthly one
 

@@ -71,6 +71,7 @@ class CashPhase(IntEnum):
 
     INCOME = 10
     RENTAL_INCOME = 20
+    OPERATING_COSTS = 25
     SPENDING = 30
     RENT = 40
     DEBT_SERVICE = 50
@@ -132,10 +133,20 @@ class YearContext:
     params: ModelParams
     year: int  # 1..years
     released: list[float] = field(default_factory=list)
+    taxable_incomes: list[float] = field(default_factory=list)
 
     def release(self, amount: float) -> None:
         """Hand cash back to the sink at year end (unused Sondertilgung)."""
         self.released.append(amount)
+
+    def add_taxable_income(self, amount: float) -> None:
+        """Announce a year's taxable non-wage result, negative for a loss.
+
+        Written in `year_settle` (stage A), consumed by the taxpayer in
+        `year_assess` (stage A2) — different stages, so the component list
+        order cannot change who sees what.
+        """
+        self.taxable_incomes.append(amount)
 
 
 class FinancialComponent:
@@ -150,6 +161,7 @@ class FinancialComponent:
     cardinality: ClassVar[Cardinality] = Cardinality.MULTI
     report_kind: ClassVar[str] = ""
     absorbs_cash: ClassVar[bool] = False
+    absorbs_taxable_income: ClassVar[bool] = False
 
     # Set by the engine from the dataclass field of the same name, or derived
     # from `default_name` when the user did not pass one.
@@ -158,6 +170,11 @@ class FinancialComponent:
     @property
     def is_sink(self) -> bool:
         """True for the one component that absorbs the month's leftover."""
+        return False
+
+    @property
+    def produces_taxable_income(self) -> bool:
+        """True when this component will call `ctx.add_taxable_income`."""
         return False
 
     # --- t = 0 -----------------------------------------------------------
@@ -209,6 +226,9 @@ class FinancialComponent:
 
     def credit_untaxed(self, state: Any, amount: float) -> None:
         """Stage (A'): sinks only — receive released cash, no growth applied."""
+
+    def year_assess(self, state: Any, ctx: YearContext) -> None:
+        """Stage (A2): consume the taxable results published in `year_settle`."""
 
     def year_withdraw(self, state: Any, ctx: YearContext) -> None:
         """Stage (B): the yearly ETF withdrawal."""

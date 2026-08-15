@@ -10,18 +10,30 @@ The refund for a year is paid out on July 1 of the *following* year and
 simply joins that month's income — the engine sweeps it into the sink like
 any other leftover cash, so it starts compounding mid-year. Two
 consequences: the very first simulated year contains no refund (there is no
-prior year), and the final year's refund arrives beyond the horizon and is
-dropped — a deliberately conservative cut.
+prior year), and the final year's settlement arrives beyond the horizon and
+is dropped. For wage over-withholding that cut is conservative — money owed
+to the household disappears. With a taxed rental *profit* the dropped
+settlement is a back-payment, so the last year's rental tax is never
+charged and the final wealth is overstated by about one year's rental tax;
+keep that in mind when comparing short horizons.
 
 The Steuerklasse combination never changes the assessed yearly tax, only how
 much cash arrives monthly versus as the July refund. "III/V" gives the first
 earner class III; "IV/IV" withholds as if both were single, which for a
 single-earner couple front-loads the tax and produces a large refund.
+
+Rental components with a `RentalTaxation` publish their yearly Einkünfte aus
+Vermietung und Verpachtung, and this household picks them up in `year_assess`:
+the year's assessed tax is recomputed with the rental result in the zvE, so
+the effect — a refund for a rental loss, a back-payment for a profit — rides
+the same July channel as the wage over-withholding. Losses only offset income
+within their year; whatever pushes the zvE below zero is forfeited (no
+Verlustvortrag).
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Sequence
 
 from ..component import (
@@ -101,6 +113,8 @@ class HouseholdState:
     yearly_withheld: float = 0.0
     yearly_assessed: float = 0.0
     yearly_social: float = 0.0
+    yearly_rental_result: float = 0.0
+    figures: list[EarnerFigures] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -122,6 +136,7 @@ class GermanHousehold(FinancialComponent):
     default_name = "household"
     cardinality = Cardinality.SINGLETON
     report_kind = "salary"
+    absorbs_taxable_income = True
 
     earners: tuple[Earner, ...] = ()
     joint: bool = True
@@ -249,6 +264,8 @@ class GermanHousehold(FinancialComponent):
         state.yearly_withheld = withheld
         state.yearly_assessed = assessment.total
         state.yearly_social = social_total
+        state.yearly_rental_result = 0.0
+        state.figures = figures
 
     def year_begin(self, state: HouseholdState, ctx: YearContext) -> None:
         self._refresh(state)
@@ -260,6 +277,31 @@ class GermanHousehold(FinancialComponent):
                 CashFlow(CashPhase.INCOME, state.refund_due),
             )
         return (CashFlow(CashPhase.INCOME, state.monthly_net),)
+
+    def year_assess(self, state: HouseholdState, ctx: YearContext) -> None:
+        """Fold the year's rental results into the assessed tax.
+
+        Runs at stage A2, after every property published its result in
+        `year_settle` and before the row is reported — so the reported
+        `yearly_assessed_tax` and the `refund_due` computed in `year_grow`
+        both include the rental effect. `_refresh` next January resets the
+        assessment to wage-only before the next round. When nothing was
+        published the wage-only assessment stands untouched, bit for bit.
+        """
+        if not ctx.taxable_incomes:
+            return
+        rental = 0.0
+        for amount in ctx.taxable_incomes:
+            rental += amount
+        state.yearly_rental_result = rental
+        system = self.tax.for_year(state.year_index)
+        assessment = assessed_tax(
+            taxable_income(state.figures, system, joint=self.joint, other_income=rental),
+            system,
+            joint=self.joint,
+            n_children=self.n_children,
+        )
+        state.yearly_assessed = assessment.total
 
     def year_grow(self, state: HouseholdState, ctx: YearContext) -> None:
         state.refund_due = state.yearly_withheld - state.yearly_assessed
@@ -285,4 +327,5 @@ class GermanHousehold(FinancialComponent):
             "yearly_withheld_tax": state.yearly_withheld,
             "yearly_refund_received": state.refund_due,
             "yearly_social_contributions": state.yearly_social,
+            "yearly_rental_result": state.yearly_rental_result,
         }

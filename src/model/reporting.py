@@ -114,11 +114,19 @@ def build_row(
     row["monthly_housing_cost"] = row["monthly_rent"] + row["monthly_mortgage_payment"]
     row["invested_capital"] = invested_capital
     if monthly_leftover is None:
+        # Operating costs have no flat column (only rental flats report them,
+        # so a summed column would break the shared "property" kind), hence
+        # the `.get` rather than a SUMMED_COLUMNS entry.
+        operating_costs = 0.0
+        for source in sources:
+            if source.kind == "property":
+                operating_costs += source.values.get("monthly_operating_costs", 0.0)
         row["monthly_leftover"] = (
             row["monthly_income"]
             + row["monthly_rental_income"]
             - row["monthly_spending"]
             - row["monthly_housing_cost"]
+            - operating_costs
         )
     else:
         row["monthly_leftover"] = monthly_leftover

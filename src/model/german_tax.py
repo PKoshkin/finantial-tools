@@ -328,7 +328,11 @@ class EarnerFigures:
 
 
 def taxable_income(
-    earners: Sequence[EarnerFigures], system: TaxSystem, *, joint: bool
+    earners: Sequence[EarnerFigures],
+    system: TaxSystem,
+    *,
+    joint: bool,
+    other_income: float = 0.0,
 ) -> float:
     """From gross wages to the zu versteuerndes Einkommen of one tax unit.
 
@@ -337,10 +341,17 @@ def taxable_income(
     health contribution (the Krankengeld haircut), the care contribution
     including any childless surcharge, and the deductible private premium.
     One Sonderausgaben-Pauschbetrag per spouse closes the chain.
+
+    `other_income` is a yearly non-wage result — Einkünfte aus Vermietung
+    und Verpachtung — joining the Summe der Einkünfte before the deductions.
+    It may be negative: a rental loss offsets wage income in the same year,
+    but whatever pushes the zvE below zero is forfeited — this model has no
+    Verlustvortrag.
     """
     zve = 0.0
     for earner in earners:
         zve += max(earner.yearly_gross - system.employee_allowance, 0.0)
+    zve += other_income
     for earner in earners:
         zve -= earner.social.pension
         zve -= earner.social.health * (1.0 - system.krankengeld_reduction)

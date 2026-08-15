@@ -209,3 +209,6 @@ __marimo__/
 # notebook verification runs (the baseline is tracked, ad-hoc runs are not)
 /artifacts/*
 !/artifacts/baseline/
+
+# reference calculation sheets; their figures are hardcoded in the tests
+/data/

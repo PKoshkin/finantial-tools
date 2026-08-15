@@ -2,7 +2,9 @@
 
 `Mortgage` is a nested value object rather than a component: a loan in this
 model always belongs to exactly one property, and the down payment, the fees
-and the loan are all derived from that property's price.
+and the loan are all derived from that property's price. `OperatingCosts` and
+`RentalTaxation` follow the same pattern for a buy-to-let flat's
+Bewirtschaftungskosten and its Vermietung-und-Verpachtung taxation.
 """
 
 from __future__ import annotations
@@ -89,6 +91,57 @@ class Mortgage:
         return self.compounding.monthly_charge(loan, self.interest_rate)
 
 
+@dataclass(frozen=True)
+class OperatingCosts:
+    """Bewirtschaftungskosten of a rental flat: the non-recoverable part.
+
+    Both amounts are per month at t=0 and escalate together once a year by
+    `yearly_increase_rate` (the Kostensteigerung). The split exists for the
+    tax return: `monthly_deductible` — the non-recoverable Hausgeld, the
+    Grundsteuer and other actual expenses — is a Werbungskosten deduction,
+    while `monthly_own_reserve` (the eigene Instandhaltungsrücklage) is money
+    set aside, a cash cost that deducts nothing. Costs the tenant reimburses
+    (umlagefähige Kosten) are not modelled at all: they cancel between the
+    Warmmiete and the expenses, so the rent stays a Nettokaltmiete.
+    """
+
+    monthly_deductible: float = 0.0
+    monthly_own_reserve: float = 0.0
+    yearly_increase_rate: float = 0.0
+
+    def __post_init__(self) -> None:
+        check_amount(self.monthly_deductible, "monthly_deductible")
+        check_amount(self.monthly_own_reserve, "monthly_own_reserve")
+        check_growth_rate(self.yearly_increase_rate, "yearly_increase_rate")
+
+
+@dataclass(frozen=True)
+class RentalTaxation:
+    """How a buy-to-let flat enters the household's income tax.
+
+    Setting this on an `InvestmentProperty` makes it publish its yearly
+    Einkünfte aus Vermietung und Verpachtung — rent minus deductible costs,
+    loan interest and AfA — to the model's `GermanHousehold`, whose assessed
+    tax then moves accordingly (the cash arrives with the July refund of the
+    following year). The AfA base is `(price + purchase fees) * building_share`
+    and depreciates at `afa_rate` a year (§7 EStG: 2% for existing buildings,
+    3% for new ones), flat forever — the model does not stop depreciating
+    once the building is written off, which overstates the deduction beyond
+    `1 / afa_rate` years.
+    """
+
+    afa_rate: float
+    building_share: float
+
+    def __post_init__(self) -> None:
+        check_amount(self.afa_rate, "afa_rate")
+        if self.afa_rate > 1.0:
+            raise ValueError("afa_rate must be within [0, 1]")
+        check_amount(self.building_share, "building_share")
+        if self.building_share > 1.0:
+            raise ValueError("building_share must be within [0, 1]")
+
+
 @dataclass(slots=True)
 class PropertyState:
     loan: float
@@ -105,6 +158,11 @@ class PropertyState:
     sondertilgung_reserved: float = 0.0
     yearly_sondertilgung: float = 0.0
     cumulative_interest: float = 0.0
+    monthly_deductible_costs: float = 0.0
+    monthly_own_reserve: float = 0.0
+    monthly_afa: float = 0.0
+    year_taxable_result: float = 0.0
+    cumulative_cashflow: float = 0.0
 
 
 class _PropertyBase(FinancialComponent):
@@ -306,8 +364,13 @@ class Home(_PropertyBase):
 class InvestmentProperty(_PropertyBase):
     """A flat bought to rent out. Any number of them per model.
 
-    The rental income is modelled as plain tax-free cash, exactly as before the
-    refactoring — no vacancy, maintenance, Hausgeld or rental income tax.
+    By default the rental income is plain tax-free cash, exactly as before
+    the refactoring. `operating_costs` adds the non-recoverable
+    Bewirtschaftungskosten, `vacancy_rate` a kalkulatorischer Mietausfall,
+    and `taxation` sends the flat's Einkünfte aus Vermietung und Verpachtung
+    into the model's `GermanHousehold`. A vacancy reduces the collected rent
+    and with it the taxable result — unlike the planning calculators that
+    book the Mietausfall as a non-deductible reserve on top of full rent.
     """
 
     default_name = "flat"
@@ -318,6 +381,9 @@ class InvestmentProperty(_PropertyBase):
     monthly_rental_income: float = 0.0
     yearly_rental_income_increase_rate: float = 0.0
     mortgage: Mortgage | None = None
+    operating_costs: OperatingCosts | None = None
+    vacancy_rate: float = 0.0
+    taxation: RentalTaxation | None = None
     name: str | None = None
 
     def __post_init__(self) -> None:
@@ -326,6 +392,31 @@ class InvestmentProperty(_PropertyBase):
         check_growth_rate(
             self.yearly_rental_income_increase_rate, "yearly_rental_income_increase_rate"
         )
+        if self.operating_costs is not None and not isinstance(
+            self.operating_costs, OperatingCosts
+        ):
+            raise TypeError("operating_costs must be an OperatingCosts or None")
+        check_amount(self.vacancy_rate, "vacancy_rate")
+        if self.vacancy_rate > 1.0:
+            raise ValueError("vacancy_rate must be within [0, 1]")
+        if self.taxation is not None and not isinstance(self.taxation, RentalTaxation):
+            raise TypeError("taxation must be a RentalTaxation or None")
+
+    @property
+    def produces_taxable_income(self) -> bool:
+        return self.taxation is not None
+
+    # --- derived amounts, handy in notebooks ---
+    @property
+    def afa_base(self) -> float:
+        """The depreciable acquisition cost: building share of price plus fees."""
+        if self.taxation is None:
+            return 0.0
+        return (self.price + self.purchase_fees) * self.taxation.building_share
+
+    @property
+    def monthly_afa(self) -> float:
+        return 0.0 if self.taxation is None else self.afa_base * self.taxation.afa_rate / 12.0
 
     def _initial_rental_income(self) -> float:
         return self.monthly_rental_income
@@ -333,8 +424,78 @@ class InvestmentProperty(_PropertyBase):
     def _rental_increase_rate(self) -> float:
         return self.yearly_rental_income_increase_rate
 
+    def _effective_rent(self, state: PropertyState) -> float:
+        # `x * 1.0 == x` exactly in IEEE 754, so a zero vacancy is bit-safe.
+        return state.monthly_rental_income * (1.0 - self.vacancy_rate)
+
+    def open(self, ctx: SetupContext) -> PropertyState:
+        state = super().open(ctx)
+        if self.operating_costs is not None:
+            state.monthly_deductible_costs = self.operating_costs.monthly_deductible
+            state.monthly_own_reserve = self.operating_costs.monthly_own_reserve
+        state.monthly_afa = self.monthly_afa
+        if self.mortgage is None:
+            state.cumulative_cashflow = -self.price
+        else:
+            state.cumulative_cashflow = -(state.down_payment + state.purchase_fees)
+        return state
+
     def cash_flows(self, state: PropertyState, ctx: MonthContext) -> Sequence[CashFlow]:
-        return (
-            CashFlow(CashPhase.RENTAL_INCOME, state.monthly_rental_income),
+        flows = [
+            CashFlow(CashPhase.RENTAL_INCOME, self._effective_rent(state)),
             CashFlow(CashPhase.DEBT_SERVICE, -state.month_payment),
+        ]
+        if self.operating_costs is not None:
+            flows.insert(
+                1,
+                CashFlow(
+                    CashPhase.OPERATING_COSTS,
+                    -(state.monthly_deductible_costs + state.monthly_own_reserve),
+                ),
+            )
+        return tuple(flows)
+
+    def year_settle(self, state: PropertyState, ctx: YearContext) -> None:
+        super().year_settle(state, ctx)
+        # Rent and costs are constant within a year (escalation is stage E),
+        # so twelve times the monthly figure is the exact yearly total.
+        state.cumulative_cashflow += (
+            12.0 * self._effective_rent(state)
+            - 12.0 * (state.monthly_deductible_costs + state.monthly_own_reserve)
+            - state.year_mortgage_paid
+            - state.yearly_sondertilgung
         )
+        if self.taxation is not None:
+            state.year_taxable_result = (
+                12.0 * self._effective_rent(state)
+                - 12.0 * state.monthly_deductible_costs
+                - state.year_interest
+                - 12.0 * state.monthly_afa
+            )
+            ctx.add_taxable_income(state.year_taxable_result)
+
+    def year_grow(self, state: PropertyState, ctx: YearContext) -> None:
+        super().year_grow(state, ctx)
+        if self.operating_costs is not None:
+            rate = self.operating_costs.yearly_increase_rate
+            state.monthly_deductible_costs *= 1.0 + rate
+            state.monthly_own_reserve *= 1.0 + rate
+
+    def report(self, state: PropertyState, ctx: YearContext) -> dict[str, float]:
+        values = super().report(state, ctx)
+        values["monthly_rental_income"] = self._effective_rent(state)
+        return values | self._extra_report(state)
+
+    def report_initial(self, state: PropertyState) -> dict[str, float]:
+        values = super().report_initial(state)
+        values["monthly_rental_income"] = self._effective_rent(state)
+        return values | self._extra_report(state)
+
+    def _extra_report(self, state: PropertyState) -> dict[str, float]:
+        return {
+            "monthly_operating_costs": state.monthly_deductible_costs
+            + state.monthly_own_reserve,
+            "monthly_afa": state.monthly_afa,
+            "yearly_taxable_result": state.year_taxable_result,
+            "cumulative_cashflow": state.cumulative_cashflow,
+        }

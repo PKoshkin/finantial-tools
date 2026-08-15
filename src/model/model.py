@@ -88,6 +88,7 @@ class FinancialModel:
         self._by_name = dict(zip(self._names, components))
         _check_cardinality(components)
         self._sink_index = _find_sink_index(components, self._names)
+        _check_taxable_income(components, self._names)
         self._check_initial_capital()
         self._result: pd.DataFrame | None = None
 
@@ -286,6 +287,10 @@ class FinancialModel:
                     # principal could not use it, so it did end up invested.
                     year_invested += amount
 
+            # (A2) the year's taxable results reach the taxpayer
+            for component, state in zip(components, states):
+                component.year_assess(state, year_ctx)
+
             # (B) the yearly withdrawal
             for component, state in zip(components, states):
                 component.year_withdraw(state, year_ctx)
@@ -399,6 +404,24 @@ def _find_sink_index(
             "Give all but one a fixed monthly_investment."
         )
     return sinks[0]
+
+
+def _check_taxable_income(
+    components: Sequence[FinancialComponent], names: Sequence[str]
+) -> None:
+    producers = [
+        name
+        for name, component in zip(names, components)
+        if component.produces_taxable_income
+    ]
+    if producers and not any(
+        component.absorbs_taxable_income for component in components
+    ):
+        raise ValueError(
+            f"component(s) {', '.join(producers)} declare rental taxation but the "
+            "model has no GermanHousehold to assess it; add one or drop the "
+            "taxation parameter"
+        )
 
 
 def _replace_at(obj: Any, path: list[str], changes: dict[str, Any], full_path: str) -> Any:

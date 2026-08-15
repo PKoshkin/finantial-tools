@@ -61,8 +61,15 @@ Model semantics — the details that decide what the numbers mean:
   portfolio (average-cost method).
 - A yearly withdrawal is taken at year end, after the Sondertilgung, taxed on
   its gain part, and considered consumed rather than reinvested.
-- Spending grows monthly with inflation; salaries, rent and rental income grow
-  once a year, after the row for that year has been emitted.
+- Spending grows monthly with inflation; salaries, rent, rental income and a
+  flat's operating costs grow once a year, after the row for that year has
+  been emitted.
+- Rental taxation: a flat with `RentalTaxation` publishes its yearly
+  Einkünfte aus Vermietung und Verpachtung (rent − deductible operating costs
+  − loan interest − AfA on `(price + fees) * building_share`) to the
+  `GermanHousehold`, which re-assesses the year's income tax with it — the
+  cash effect rides the July refund of the following year. Losses offset wage
+  income within their year only (no Verlustvortrag).
 - Monthly flow columns (interest, repayment, leftover, spending, ...) are
   averages over the 12 months of that year.
 - `monthly_leftover` is the household surplus before anything is withheld from
@@ -97,8 +104,10 @@ from .components import (
     Home,
     InvestmentProperty,
     Mortgage,
+    OperatingCosts,
     PrivateHealthInsurance,
     Rent,
+    RentalTaxation,
     Salary,
     Spending,
 )
@@ -129,8 +138,10 @@ __all__ = [
     "ModelParams",
     "MonthContext",
     "Mortgage",
+    "OperatingCosts",
     "PrivateHealthInsurance",
     "Rent",
+    "RentalTaxation",
     "Salary",
     "SetupContext",
     "Spending",
