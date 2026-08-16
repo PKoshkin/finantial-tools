@@ -70,6 +70,12 @@ Model semantics — the details that decide what the numbers mean:
   `GermanHousehold`, which re-assesses the year's income tax with it — the
   cash effect rides the July refund of the following year. Losses offset wage
   income within their year only (no Verlustvortrag).
+- Insurance deductions: the unemployment contribution counts toward payroll
+  and assessment only as far as it fits the 1,900 € bucket (§10 Abs. 4) next
+  to the health-and-care deduction — irrelevant on a statutory wage, decisive
+  for a privately insured earner with a small Basisabsicherung. A private
+  contract's `monthly_rebate` (Beitragsstundung) reduces cash only, never the
+  tax figures.
 - Monthly flow columns (interest, repayment, leftover, spending, ...) are
   averages over the 12 months of that year.
 - `monthly_leftover` is the household surplus before anything is withheld from

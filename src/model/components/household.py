@@ -69,12 +69,20 @@ class PrivateHealthInsurance:
     `yearly_increase_rate` is the contract's own premium drift, applied on
     top of nothing else — private premiums move with claims inflation, not
     with the salary.
+
+    `monthly_rebate` is a Pauschalerstattung the insurer nets against the
+    debit (a Beitragsstundung): it reduces only the monthly cash outflow.
+    Payroll and assessment keep using the full contract figures, exactly as
+    they do in reality — and the rebate is contingent, lost for any year in
+    which claims are filed, so modelling it is an optimistic choice. It
+    escalates with the premiums.
     """
 
     monthly_premium: float = 0.0
     monthly_care_premium: float = 60.0
     deductible_share: float = 0.9
     yearly_increase_rate: float = 0.035
+    monthly_rebate: float = 0.0
 
     def __post_init__(self) -> None:
         check_amount(self.monthly_premium, "monthly_premium")
@@ -82,6 +90,9 @@ class PrivateHealthInsurance:
         if not 0.0 <= self.deductible_share <= 1.0:
             raise ValueError("deductible_share must be within [0, 1]")
         check_growth_rate(self.yearly_increase_rate, "yearly_increase_rate")
+        check_amount(self.monthly_rebate, "monthly_rebate")
+        if self.monthly_rebate > self.monthly_premium + self.monthly_care_premium:
+            raise ValueError("monthly_rebate must not exceed the premiums it discounts")
 
 
 @dataclass(frozen=True)
@@ -106,6 +117,7 @@ class HouseholdState:
     monthly_gross: list[float]
     monthly_premiums: list[float]
     monthly_care_premiums: list[float]
+    monthly_rebates: list[float]
     year_index: int = 0
     refund_due: float = 0.0  # last year's over-withholding, paid out in July
     monthly_net: float = 0.0
@@ -185,6 +197,10 @@ class GermanHousehold(FinancialComponent):
                 else earner.private_health.monthly_care_premium
                 for earner in self.earners
             ],
+            monthly_rebates=[
+                0.0 if earner.private_health is None else earner.private_health.monthly_rebate
+                for earner in self.earners
+            ],
         )
         self._refresh(state)
         return state
@@ -249,6 +265,7 @@ class GermanHousehold(FinancialComponent):
                 net -= state.monthly_premiums[index]
                 net -= state.monthly_care_premiums[index]
                 net += subsidy
+                net += state.monthly_rebates[index]
             withheld += withheld_earner.income_tax
             withheld += withheld_earner.solidarity
             social_total += social.total
@@ -311,6 +328,7 @@ class GermanHousehold(FinancialComponent):
                 rate = earner.private_health.yearly_increase_rate
                 state.monthly_premiums[index] *= 1.0 + rate
                 state.monthly_care_premiums[index] *= 1.0 + rate
+                state.monthly_rebates[index] *= 1.0 + rate
         state.year_index += 1
 
     def report(self, state: HouseholdState, ctx: YearContext) -> dict[str, float]:

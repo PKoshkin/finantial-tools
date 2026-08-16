@@ -74,6 +74,7 @@ class TaxSystem:
     employee_allowance: float = 1_230.0  # Arbeitnehmer-Pauschbetrag, per earner
     special_expenses_allowance: float = 36.0  # Sonderausgaben-Pauschbetrag, doubled jointly
     krankengeld_reduction: float = 0.04  # deductible health contribution is 96%
+    other_vorsorge_cap: float = 1_900.0  # §10 Abs. 4 bucket; fixed by law, does not drift
 
     # --- Solidaritätszuschlag ---------------------------------------------
     soli_rate: float = 0.055
@@ -347,6 +348,13 @@ def taxable_income(
     It may be negative: a rental loss offsets wage income in the same year,
     but whatever pushes the zvE below zero is forfeited — this model has no
     Verlustvortrag.
+
+    The unemployment contribution counts as far as it still fits the
+    1,900 EUR bucket (§10 Abs. 4) next to the earner's health-and-care
+    deduction — full on a statutory wage, so only a small private premium
+    leaves it room. Other bucket dwellers (Krankentagegeld and comfort
+    premium shares, liability insurance) are not modelled: the unemployment
+    contribution alone fills whatever room a real wage leaves.
     """
     zve = 0.0
     for earner in earners:
@@ -357,6 +365,14 @@ def taxable_income(
         zve -= earner.social.health * (1.0 - system.krankengeld_reduction)
         zve -= earner.social.care
         zve -= earner.private_deductible
+        basis = (
+            earner.social.health * (1.0 - system.krankengeld_reduction)
+            + earner.social.care
+            + earner.private_deductible
+        )
+        room = system.other_vorsorge_cap - basis
+        if room > 0.0:
+            zve -= min(earner.social.unemployment, room)
     zve -= system.special_expenses_allowance * (2.0 if joint else 1.0)
     return max(zve, 0.0)
 
@@ -407,20 +423,30 @@ def _vorsorgepauschale(
 ) -> float:
     """The 2026 payroll stand-in for the assessment's insurance deductions.
 
-    Pension share plus — for statutory insurance — the health share at the
-    *reduced* rate (the payroll convention) and the care share; for private
-    insurance, the certified deductible premium takes the place of both.
-    The unemployment component introduced in 2026 is crowded out by its
-    1,900 EUR cap at any full-time wage, so it is omitted entirely, and the
+    Pension share plus the health-and-care part: for statutory insurance the
+    health share at the *reduced* rate (the payroll convention) plus the care
+    share, for private insurance the certified deductible premium in place of
+    both. The unemployment contribution, part of the pauschale since 2026,
+    only counts as far as it still fits the 1,900 EUR bucket next to the
+    health-and-care part — on a statutory full-time wage the bucket is
+    already full and it adds nothing, which is why only a small *private*
+    premium feels it (pinned to the cent against a real 2026 payslip). The
     Mindestvorsorgepauschale was abolished from 2026.
     """
     pension_part = system.rv_rate / 2.0 * min(yearly_wage, system.bbg_pension)
     if private_deductible is not None:
-        return pension_part + private_deductible
-    health_base = min(yearly_wage, system.bbg_health)
-    health_part = (system.kv_reduced_rate + system.kv_extra_rate) / 2.0 * health_base
-    care_part = _employee_care_rate(system, n_children) * health_base
-    return pension_part + health_part + care_part
+        health_care_part = private_deductible
+        pauschale = pension_part + private_deductible
+    else:
+        health_base = min(yearly_wage, system.bbg_health)
+        health_part = (system.kv_reduced_rate + system.kv_extra_rate) / 2.0 * health_base
+        care_part = _employee_care_rate(system, n_children) * health_base
+        health_care_part = health_part + care_part
+        pauschale = pension_part + health_part + care_part
+    room = system.other_vorsorge_cap - health_care_part
+    if room > 0.0:
+        pauschale += min(system.av_rate / 2.0 * min(yearly_wage, system.bbg_pension), room)
+    return pauschale
 
 
 def _class_five_tax(base: float, system: TaxSystem) -> float:

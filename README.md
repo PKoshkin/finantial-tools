@@ -76,7 +76,12 @@ Every component also takes a `name`, which prefixes its own result columns.
 `refinancing_years`, `sondertilgung_yearly_rate`, `compounding`), because a loan
 here always belongs to one property and is derived from its price. A rental
 flat nests two more value objects the same way: `OperatingCosts` and
-`RentalTaxation` (see below).
+`RentalTaxation` (see below). An `Earner` may nest a `PrivateHealthInsurance`
+(`monthly_premium`, `monthly_care_premium`, `deductible_share`,
+`yearly_increase_rate`, `monthly_rebate` — a Pauschalerstattung netted against
+the debit, cash-only: payroll and assessment keep using the full contract
+figures). The payroll chain is pinned against a real 2026 DATEV payslip in
+`tests/test_real_payslips.py`.
 
 Rates of return are per component: two portfolios can grow at different rates
 and be taxed differently.

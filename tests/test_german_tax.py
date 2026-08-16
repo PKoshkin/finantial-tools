@@ -232,3 +232,54 @@ class TestInertia:
         # More generous borders: the same income owes less tax than today.
         assert income_tax(100_000, drifted) < income_tax(100_000, SYSTEM)
         assert income_tax(drifted.basic_allowance, drifted) == 0.0
+
+
+class TestOtherVorsorgeCap:
+    """The 1,900 EUR bucket (§10 Abs. 4, mirrored by the 2026 payroll rules).
+
+    The unemployment contribution is deductible only as far as it fits the
+    bucket next to the health-and-care deduction. A statutory full-time wage
+    fills the bucket on its own; a small private Basisabsicherung leaves
+    room. The low-basis figures are pinned to the cent against a real DATEV
+    payslip (May 2026): gross 100,000, private basis 702/yr, Steuerklasse IV
+    -> Lohnsteuer 2,135.66-2,135.67 a month, Soli 52.34.
+    """
+
+    def test_small_private_basis_lets_unemployment_fill_the_bucket(self):
+        # Vorsorgepauschale = 9,300 (RV) + 702 + min(1,300, 1,900 - 702 = 1,198)
+        # -> zvE 100,000 - 1,230 - 36 - 11,200 = 87,534 -> tax 25,628.
+        held = withholding(100_000, SYSTEM, tax_class="IV", n_children=0, private_deductible=702.0)
+        assert held.income_tax == 25_628.0
+        assert held.solidarity == pytest.approx(628.08)
+
+    def test_large_private_basis_leaves_no_room(self):
+        # Basis 4,392 > 1,900: the bucket is full, nothing changes against the
+        # plain pension + basis pauschale.
+        base = 100_000 - 1_230 - 36 - 9_300 - 4_392
+        held = withholding(100_000, SYSTEM, tax_class="IV", n_children=0, private_deductible=4_392.0)
+        assert held.income_tax == income_tax(base, SYSTEM)
+
+    def test_statutory_full_time_wage_is_unaffected(self):
+        # Health + care parts alone exceed 1,900 at any full-time wage, so the
+        # unemployment component must not change the pauschale.
+        base = 40_000 - 1_230 - 36
+        base -= SYSTEM.rv_rate / 2.0 * 40_000
+        base -= (SYSTEM.kv_reduced_rate + SYSTEM.kv_extra_rate) / 2.0 * 40_000
+        base -= (SYSTEM.pv_rate / 2.0 + SYSTEM.childless_surcharge) * 40_000
+        held = withholding(40_000, SYSTEM, tax_class="I", n_children=0)
+        assert held.income_tax == income_tax(base, SYSTEM)
+
+    def test_assessment_bucket_mirrors_the_payroll_one(self):
+        social = social_contributions(100_000, SYSTEM, n_children=0, private_health=True)
+        private = EarnerFigures(yearly_gross=100_000, social=social, private_deductible=702.0)
+        zve = taxable_income([private], SYSTEM, joint=False)
+        # gross - 1,230 (Arbeitnehmer) - 9,300 (RV) - 702 (basis) - 1,198
+        # (unemployment, capped by the bucket) - 36 (Sonderausgaben).
+        assert zve == pytest.approx(100_000 - 1_230 - 9_300 - 702 - 1_198 - 36)
+
+    def test_assessment_bucket_is_inert_for_statutory_earners(self):
+        social = social_contributions(120_000, SYSTEM, n_children=0, private_health=False)
+        earner = EarnerFigures(yearly_gross=120_000, social=social)
+        # Health x 0.96 + care exceed 1,900, so the unemployment contribution
+        # deducts nothing: the pinned figure from TestTaxableIncome holds.
+        assert taxable_income([earner], SYSTEM, joint=False) == pytest.approx(101_770.80)
