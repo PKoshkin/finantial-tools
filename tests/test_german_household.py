@@ -6,6 +6,7 @@ from src.model.german_tax import (
     EarnerFigures,
     TaxSystem,
     assessed_tax,
+    employee_year,
     private_deductible,
     private_subsidy,
     social_contributions,
@@ -209,3 +210,80 @@ class TestValidation:
                 Etf(),
             ]
             FinancialModel(components=build_two, years=1)
+
+
+class TestAgreementWithTheStandaloneYear:
+    """`employee_year` runs the same chain outside the engine.
+
+    It exists for questions about a single year — what a salary costs, what
+    share of it arrives — where building a one-year forecast would be noise.
+    That only holds while the two agree, so both insurance cases are pinned
+    against the component here. The component reports the monthly *payout*,
+    which is `net_paid_out`; the assessment reaches it a year later as the
+    July refund.
+    """
+
+    def test_a_statutory_single_earner(self):
+        gross = 84_000
+        df = build(
+            GermanHousehold(earners=(Earner(monthly_gross=gross / 12),), joint=False)
+        ).run()
+        year = employee_year(gross, SYSTEM, tax_class="I", joint=False)
+
+        assert df.loc[1, "household.monthly_amount"] == pytest.approx(
+            year.net_paid_out / 12.0
+        )
+        assert df.loc[1, "household.yearly_social_contributions"] == pytest.approx(
+            year.employee_social.total
+        )
+        assert df.loc[1, "household.yearly_withheld_tax"] == pytest.approx(
+            year.withheld.total
+        )
+        assert df.loc[1, "household.yearly_assessed_tax"] == pytest.approx(
+            year.assessed.total
+        )
+        assert df.loc[2, "household.yearly_refund_received"] == pytest.approx(year.refund)
+
+    def test_a_privately_insured_married_single_earner(self):
+        gross = 150_000
+        contract = PrivateHealthInsurance(
+            monthly_premium=840, monthly_care_premium=60, monthly_rebate=90
+        )
+        df = build(
+            GermanHousehold(
+                earners=(Earner(monthly_gross=gross / 12, private_health=contract),),
+                tax_classes="III/V",
+            )
+        ).run()
+        year = employee_year(
+            gross,
+            SYSTEM,
+            tax_class="III",
+            joint=True,
+            monthly_premium=contract.monthly_premium,
+            monthly_care_premium=contract.monthly_care_premium,
+            deductible_share=contract.deductible_share,
+            monthly_rebate=contract.monthly_rebate,
+        )
+
+        assert df.loc[1, "household.monthly_amount"] == pytest.approx(
+            year.net_paid_out / 12.0
+        )
+        assert df.loc[1, "household.yearly_assessed_tax"] == pytest.approx(
+            year.assessed.total
+        )
+        assert df.loc[2, "household.yearly_refund_received"] == pytest.approx(year.refund)
+
+    def test_children_agree_too(self):
+        gross = 60_000
+        df = build(
+            GermanHousehold(
+                earners=(Earner(monthly_gross=gross / 12),),
+                tax_classes="IV/IV",
+                n_children=2,
+            )
+        ).run()
+        year = employee_year(gross, SYSTEM, tax_class="IV", joint=True, n_children=2)
+        assert df.loc[1, "household.monthly_amount"] == pytest.approx(
+            year.net_paid_out / 12.0
+        )

@@ -12,6 +12,8 @@ from src.model.german_tax import (
     EarnerFigures,
     TaxSystem,
     assessed_tax,
+    employee_year,
+    employer_contributions,
     income_tax,
     private_deductible,
     private_subsidy,
@@ -283,3 +285,145 @@ class TestOtherVorsorgeCap:
         # Health x 0.96 + care exceed 1,900, so the unemployment contribution
         # deducts nothing: the pinned figure from TestTaxableIncome holds.
         assert taxable_income([earner], SYSTEM, joint=False) == pytest.approx(101_770.80)
+
+
+class TestEmployerContributions:
+    def test_the_employer_pays_the_same_but_for_the_care_adjustments(self):
+        employee = social_contributions(
+            50_000, SYSTEM, n_children=0, private_health=False
+        )
+        employer = employer_contributions(50_000, SYSTEM, private_health=False)
+        assert employer.pension == employee.pension
+        assert employer.unemployment == employee.unemployment
+        assert employer.health == employee.health
+        # The childless surcharge is the employee's alone: 1.8% against 2.4%.
+        assert employer.care == pytest.approx(50_000 * 0.018)
+        assert employee.care == pytest.approx(50_000 * 0.024)
+
+    def test_children_discount_the_employee_only(self):
+        childless = employer_contributions(50_000, SYSTEM, private_health=False)
+        with_kids = employer_contributions(50_000, SYSTEM, private_health=False)
+        assert childless.care == with_kids.care
+        assert social_contributions(
+            50_000, SYSTEM, n_children=3, private_health=False
+        ).care < childless.care
+
+    def test_each_base_caps_on_its_own(self):
+        # SVRV 2026: 101,400 for RV/AV, 69,750 for KV/PV.
+        employer = employer_contributions(200_000, SYSTEM, private_health=False)
+        assert employer.pension == pytest.approx(101_400 * 0.093)
+        assert employer.unemployment == pytest.approx(101_400 * 0.013)
+        assert employer.health == pytest.approx(69_750 * 0.0875)
+        assert employer.care == pytest.approx(69_750 * 0.018)
+
+    def test_private_health_empties_the_health_slots(self):
+        employer = employer_contributions(100_000, SYSTEM, private_health=True)
+        assert employer.health == 0.0
+        assert employer.care == 0.0
+        assert employer.pension == pytest.approx(9_300.0)
+
+
+class TestEmployeeYear:
+    def test_the_100k_statutory_single_chain(self):
+        year = employee_year(100_000, SYSTEM)
+        # 9.3% + 1.3% on the whole gross (under the 101,400 ceiling), then
+        # 8.75% + 2.4% on the 69,750 health ceiling.
+        assert year.employee_social.total == pytest.approx(
+            9_300 + 1_300 + 6_103.125 + 1_674
+        )
+        # The employer's care share carries no childless surcharge.
+        assert year.employer_social.total == pytest.approx(
+            9_300 + 1_300 + 6_103.125 + 1_255.50
+        )
+        assert year.employer_cost == pytest.approx(117_958.625)
+        # zvE = gross - 1,230 - 9,300 - 0.96 x 6,103.125 - 1,674 - 36.
+        zve = 100_000 - 1_230 - 9_300 - 5_859.0 - 1_674 - 36
+        assert year.assessed.income_tax == income_tax(zve, SYSTEM) == 23_262.0
+        assert year.assessed.solidarity == pytest.approx(346.52)
+        assert year.net == pytest.approx(100_000 - 18_377.125 - 23_608.52)
+        assert year.take_home_share == pytest.approx(0.4918195, abs=1e-7)
+
+    def test_the_refund_bridges_the_two_nets(self):
+        year = employee_year(100_000, SYSTEM)
+        assert year.net - year.net_paid_out == pytest.approx(year.refund)
+        # The 2026 pauschale deducts slightly more than the assessment allows,
+        # so a plain statutory wage is under-withheld and owes a little back.
+        assert year.refund < 0.0
+
+    def test_an_unpaid_year_has_no_share(self):
+        year = employee_year(0.0, SYSTEM)
+        assert year.employer_cost == 0.0
+        assert year.net == 0.0
+        assert year.take_home_share == 0.0
+
+    def test_below_the_basic_allowance_only_the_contributions_bite(self):
+        year = employee_year(12_000, SYSTEM)
+        assert year.assessed.total == 0.0
+        # 21.75% employee, 21.15% employer: the share is pure arithmetic.
+        assert year.take_home_share == pytest.approx(0.7825 / 1.2115, abs=1e-6)
+
+    def test_above_both_ceilings_a_raise_costs_the_employer_its_face_value(self):
+        lower = employee_year(150_000, SYSTEM)
+        higher = employee_year(151_000, SYSTEM)
+        assert higher.employer_cost - lower.employer_cost == pytest.approx(1_000.0)
+        assert higher.employee_social.total == pytest.approx(lower.employee_social.total)
+
+    def test_the_share_dips_around_the_ceilings_and_then_recovers(self):
+        share = lambda gross: employee_year(gross, SYSTEM).take_home_share
+        # Rising tax rates push it down while the ceilings still bind, ...
+        assert share(20_000) > share(60_000) > share(110_000)
+        # ... and once contributions are frozen the flat 42% lets it climb.
+        assert share(110_000) < share(200_000) < share(400_000)
+
+    def test_the_married_single_earner_keeps_more(self):
+        single = employee_year(100_000, SYSTEM)
+        married = employee_year(100_000, SYSTEM, tax_class="III", joint=True)
+        assert married.employer_cost == pytest.approx(single.employer_cost)
+        # Splitting halves the income before the tariff: the same cost, more net.
+        assert married.assessed.income_tax == splitting_tax(
+            100_000 - 1_230 - 9_300 - 5_859.0 - 1_674 - 72, SYSTEM
+        )
+        assert married.net > single.net
+
+    def test_the_tax_class_moves_cash_but_not_the_year(self):
+        one = employee_year(100_000, SYSTEM, tax_class="I")
+        four = employee_year(100_000, SYSTEM, tax_class="IV")
+        five = employee_year(100_000, SYSTEM, tax_class="V")
+        assert one.assessed.total == four.assessed.total == five.assessed.total
+        assert one.net == pytest.approx(four.net) == pytest.approx(five.net)
+        assert five.net_paid_out < one.net_paid_out  # class V front-loads the tax
+
+    def test_children_add_the_kindergeld_and_soften_the_care_rate(self):
+        childless = employee_year(100_000, SYSTEM)
+        parent = employee_year(100_000, SYSTEM, n_children=2)
+        assert parent.net - childless.net == pytest.approx(
+            2 * 12 * SYSTEM.child_benefit_monthly
+            + (childless.employee_social.care - parent.employee_social.care)
+            + (childless.assessed.total - parent.assessed.total)
+        )
+
+    def test_a_private_contract_moves_the_employer_share_into_the_subsidy(self):
+        # HanseMerkur 2026 contract of the pinned payslip: 638 + 57 a month.
+        year = employee_year(
+            100_000,
+            SYSTEM,
+            tax_class="IV",
+            monthly_premium=638.0,
+            monthly_care_premium=57.0,
+            deductible_share=349.0 / 638.0,
+        )
+        assert year.employer_social.health == 0.0
+        assert year.employer_social.care == 0.0
+        assert year.employer_subsidy == pytest.approx(12 * (319.00 + 28.50))
+        assert year.employer_cost == pytest.approx(100_000 + 10_600 + 4_170)
+        assert year.private_premium == pytest.approx(12 * 695.0)
+
+    def test_the_rebate_is_cash_only(self):
+        contract = dict(
+            monthly_premium=638.0, monthly_care_premium=57.0, deductible_share=0.55
+        )
+        plain = employee_year(100_000, SYSTEM, **contract)
+        rebated = employee_year(100_000, SYSTEM, monthly_rebate=182.95, **contract)
+        assert rebated.assessed.total == plain.assessed.total
+        assert rebated.withheld.total == plain.withheld.total
+        assert rebated.net - plain.net == pytest.approx(12 * 182.95)

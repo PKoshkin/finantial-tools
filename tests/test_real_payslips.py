@@ -33,6 +33,7 @@ import pytest
 from src.model import Earner, GermanHousehold, PrivateHealthInsurance
 from src.model.german_tax import (
     TaxSystem,
+    employee_year,
     private_deductible,
     private_subsidy,
     social_contributions,
@@ -209,3 +210,41 @@ def test_rebate_changes_cash_but_never_taxes(case):
     assert with_rebate.monthly_net - without.monthly_net == pytest.approx(rebate, abs=1e-9)
     assert with_rebate.yearly_withheld == without.yearly_withheld
     assert with_rebate.yearly_assessed == without.yearly_assessed
+
+
+@parametrized
+def test_the_standalone_year_matches_the_payslip(case):
+    """`employee_year` against the same slip, cash and employer cost.
+
+    Only the withholding side is pinned here — the slip has no counterpart
+    for the assessment, so `joint` is left at its default and the resulting
+    `assessed` figure is not asserted.
+    """
+    contract = case.private_health
+    year = employee_year(
+        case.monthly_gross * 12.0,
+        SYSTEM,
+        tax_class=case.tax_class,
+        n_children=case.n_children,
+        monthly_premium=contract.monthly_premium,
+        monthly_care_premium=contract.monthly_care_premium,
+        deductible_share=contract.deductible_share,
+        monthly_rebate=contract.monthly_rebate,
+    )
+    # The slip's Auszahlungsbetrag, before the insurer debits the premium.
+    payout = year.net_paid_out + year.private_premium - year.private_rebate
+    assert payout / 12.0 == pytest.approx(case.auszahlung, abs=0.02)
+    # And what is really left once the debit has gone out.
+    assert year.net_paid_out / 12.0 == pytest.approx(
+        case.auszahlung - case.insurer_debit, abs=0.02
+    )
+    # The employer's own lines: its RV/AV share equals the employee's, and the
+    # two subsidies stand in for the health contributions it does not pay.
+    assert year.employer_cost / 12.0 == pytest.approx(
+        case.monthly_gross
+        + case.rv
+        + case.av
+        + case.ag_zuschuss_kv
+        + case.ag_zuschuss_pv,
+        abs=0.02,
+    )

@@ -279,6 +279,33 @@ def social_contributions(
     )
 
 
+def employer_contributions(
+    yearly_gross: float, system: TaxSystem, *, private_health: bool
+) -> SocialContributions:
+    """The employer's half, on the same bases and each capped on its own.
+
+    Identical to the employee's share except for the two person-specific
+    adjustments to the care rate: the childless surcharge and the per-child
+    discount are the employee's alone, so an employer pays `pv_rate / 2` for
+    everyone. For a privately insured employee the health and care slots are
+    zero and the employer pays `private_subsidy` instead, exactly as
+    `social_contributions` leaves them zero on the employee side.
+
+    Deliberately absent, and therefore missing from any employer cost built
+    on this: the Umlagen U1 and U2, the Insolvenzgeldumlage, and the accident
+    insurance (Berufsgenossenschaft) — together roughly one to two percent of
+    the gross, employer-only, and none of it ever reaching the employee.
+    """
+    pension_base = min(yearly_gross, system.bbg_pension)
+    health_base = 0.0 if private_health else min(yearly_gross, system.bbg_health)
+    return SocialContributions(
+        pension=pension_base * (system.rv_rate / 2.0),
+        unemployment=pension_base * (system.av_rate / 2.0),
+        health=health_base * ((system.kv_base_rate + system.kv_extra_rate) / 2.0),
+        care=health_base * (system.pv_rate / 2.0),
+    )
+
+
 def private_subsidy(
     monthly_premium: float, monthly_care_premium: float, system: TaxSystem
 ) -> float:
@@ -511,4 +538,140 @@ def withholding(
     return TaxAmounts(
         income_tax=tax,
         solidarity=solidarity_surcharge(tax_for_soli, system, joint=tax_class == "III"),
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class EmployeeYear:
+    """One employee's calendar year, from employer cost down to net cash.
+
+    The whole chain in one place, for questions that are about a single year
+    rather than about a forecast — "what does this salary actually cost, and
+    what share of it arrives on the card". `GermanHousehold` runs the same
+    arithmetic inside the simulation; this is the standalone form, and the two
+    are pinned against each other in the tests.
+
+    Both tax figures are kept because they answer different questions. The
+    `withheld` amounts decide the twelve monthly payouts, i.e. the payslip;
+    the `assessed` amounts are what the year finally owes once the tax return
+    settles, and their difference is `refund` — cash that in the simulation
+    only arrives the following July.
+    """
+
+    yearly_gross: float
+    employer_social: SocialContributions
+    employer_subsidy: float  # private only: the tax-free premium subsidy, yearly
+    employee_social: SocialContributions
+    private_premium: float  # yearly contract premium, health plus care
+    private_rebate: float  # yearly Pauschalerstattung netted off the debit
+    withheld: TaxAmounts
+    assessed: TaxAmounts
+    child_benefit: float
+
+    @property
+    def employer_cost(self) -> float:
+        """The Arbeitgeberbrutto: gross plus everything the employer adds."""
+        return self.yearly_gross + self.employer_social.total + self.employer_subsidy
+
+    @property
+    def refund(self) -> float:
+        """Over-withholding the assessment gives back; negative means owed."""
+        return self.withheld.total - self.assessed.total
+
+    @property
+    def net_paid_out(self) -> float:
+        """The twelve Auszahlungsbeträge, before the assessment settles."""
+        return (
+            self.yearly_gross
+            - self.employee_social.total
+            - self.withheld.total
+            - self.private_premium
+            + self.private_rebate
+            + self.employer_subsidy
+            + self.child_benefit
+        )
+
+    @property
+    def net(self) -> float:
+        """What the year is finally worth, refund included."""
+        return self.net_paid_out + self.refund
+
+    @property
+    def take_home_share(self) -> float:
+        """`net` as a share of `employer_cost`; 0.0 for an unpaid year."""
+        cost = self.employer_cost
+        return self.net / cost if cost > 0.0 else 0.0
+
+
+def employee_year(
+    yearly_gross: float,
+    system: TaxSystem,
+    *,
+    tax_class: str = "I",
+    n_children: int = 0,
+    joint: bool = False,
+    monthly_premium: float | None = None,
+    monthly_care_premium: float = 0.0,
+    deductible_share: float = 1.0,
+    monthly_rebate: float = 0.0,
+) -> EmployeeYear:
+    """One employee's full year: employer cost, contributions, tax, net.
+
+    Defaults describe the plainest case — single, childless, statutorily
+    insured, Steuerklasse I — which is also the only one where `joint` and
+    `tax_class` need no thought. A married single earner is `joint=True` with
+    `tax_class="III"`; the class alone never changes what the year owes, only
+    how much of it is withheld monthly instead of refunded.
+
+    `monthly_premium` is the private/statutory switch, the same `None`-means-
+    statutory convention `withholding` uses: pass it (with the care premium
+    and the insurer-certified `deductible_share`) to model a private contract,
+    leave it out for GKV. `monthly_rebate` is a Pauschalerstattung, cash-only.
+
+    Kindergeld is counted into the net, as `GermanHousehold` does, so a year
+    with children is comparable to one without.
+    """
+    private = monthly_premium is not None
+    employee_social = social_contributions(
+        yearly_gross, system, n_children=n_children, private_health=private
+    )
+    employer_social = employer_contributions(yearly_gross, system, private_health=private)
+    if private:
+        deductible = private_deductible(
+            monthly_premium, monthly_care_premium, deductible_share, system
+        )
+        subsidy = private_subsidy(monthly_premium, monthly_care_premium, system) * 12.0
+        premium = (monthly_premium + monthly_care_premium) * 12.0
+        rebate = monthly_rebate * 12.0
+    else:
+        deductible = None
+        subsidy = 0.0
+        premium = 0.0
+        rebate = 0.0
+    figures = EarnerFigures(
+        yearly_gross=yearly_gross,
+        social=employee_social,
+        private_deductible=0.0 if deductible is None else deductible,
+    )
+    return EmployeeYear(
+        yearly_gross=yearly_gross,
+        employer_social=employer_social,
+        employer_subsidy=subsidy,
+        employee_social=employee_social,
+        private_premium=premium,
+        private_rebate=rebate,
+        withheld=withholding(
+            yearly_gross,
+            system,
+            tax_class=tax_class,
+            n_children=n_children,
+            private_deductible=deductible,
+        ),
+        assessed=assessed_tax(
+            taxable_income([figures], system, joint=joint),
+            system,
+            joint=joint,
+            n_children=n_children,
+        ),
+        child_benefit=n_children * 12.0 * system.child_benefit_monthly,
     )

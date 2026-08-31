@@ -1,0 +1,268 @@
+===== cell 2 =====
+[text/plain]
+   yearly_gross  employer_cost  employer_social  employee_social     tax  \
+0       24000.0      29076.000         5076.000         5220.000  1061.0   
+1       24150.0      29257.725         5107.725         5252.625  1090.0   
+2       24300.0      29439.450         5139.450         5285.250  1118.0   
+3       24450.0      29621.175         5171.175         5317.875  1147.0   
+4       24600.0      29802.900         5202.900         5350.500  1176.0   
+
+         net  take_home_share  
+0  17719.000         0.609403  
+1  17807.375         0.608638  
+2  17896.750         0.607917  
+3  17985.125         0.607171  
+4  18073.500         0.606434  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>yearly_gross</th>
+      <th>employer_cost</th>
+      <th>employer_social</th>
+      <th>employee_social</th>
+      <th>tax</th>
+      <th>net</th>
+      <th>take_home_share</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>24000.0</td>
+      <td>29076.000</td>
+      <td>5076.000</td>
+      <td>5220.000</td>
+      <td>1061.0</td>
+      <td>17719.000</td>
+      <td>0.609403</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24150.0</td>
+      <td>29257.725</td>
+      <td>5107.725</td>
+      <td>5252.625</td>
+      <td>1090.0</td>
+      <td>17807.375</td>
+      <td>0.608638</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24300.0</td>
+      <td>29439.450</td>
+      <td>5139.450</td>
+      <td>5285.250</td>
+      <td>1118.0</td>
+      <td>17896.750</td>
+      <td>0.607917</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>24450.0</td>
+      <td>29621.175</td>
+      <td>5171.175</td>
+      <td>5317.875</td>
+      <td>1147.0</td>
+      <td>17985.125</td>
+      <td>0.607171</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>24600.0</td>
+      <td>29802.900</td>
+      <td>5202.900</td>
+      <td>5350.500</td>
+      <td>1176.0</td>
+      <td>18073.500</td>
+      <td>0.606434</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 3 =====
+[text/plain]
+<Figure size 1400x700 with 1 Axes>
+===== cell 4 =====
+[text/plain]
+   gross / yr employer cost / yr  net / yr net / month % of employer cost  \
+0     €30,000            €36,345   €21,223      €1,769              58.4%   
+1     €40,000            €48,460   €26,887      €2,241              55.5%   
+2     €50,000            €60,575   €32,329      €2,694              53.4%   
+3     €60,000            €72,690   €37,551      €3,129              51.7%   
+4     €70,000            €84,779   €42,570      €3,547              50.2%   
+5     €80,000            €95,839   €48,035      €4,003              50.1%   
+6    €100,000           €117,959   €58,014      €4,835              49.2%   
+7    €120,000           €138,107   €68,528      €5,711              49.6%   
+8    €150,000           €168,107   €84,836      €7,070              50.5%   
+9    €200,000           €218,107  €112,681      €9,390              51.7%   
+10   €300,000           €318,107  €168,246     €14,020              52.9%   
+
+   % of gross  
+0       70.7%  
+1       67.2%  
+2       64.7%  
+3       62.6%  
+4       60.8%  
+5       60.0%  
+6       58.0%  
+7       57.1%  
+8       56.6%  
+9       56.3%  
+10      56.1%  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gross / yr</th>
+      <th>employer cost / yr</th>
+      <th>net / yr</th>
+      <th>net / month</th>
+      <th>% of employer cost</th>
+      <th>% of gross</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>€30,000</td>
+      <td>€36,345</td>
+      <td>€21,223</td>
+      <td>€1,769</td>
+      <td>58.4%</td>
+      <td>70.7%</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>€40,000</td>
+      <td>€48,460</td>
+      <td>€26,887</td>
+      <td>€2,241</td>
+      <td>55.5%</td>
+      <td>67.2%</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>€50,000</td>
+      <td>€60,575</td>
+      <td>€32,329</td>
+      <td>€2,694</td>
+      <td>53.4%</td>
+      <td>64.7%</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>€60,000</td>
+      <td>€72,690</td>
+      <td>€37,551</td>
+      <td>€3,129</td>
+      <td>51.7%</td>
+      <td>62.6%</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>€70,000</td>
+      <td>€84,779</td>
+      <td>€42,570</td>
+      <td>€3,547</td>
+      <td>50.2%</td>
+      <td>60.8%</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>€80,000</td>
+      <td>€95,839</td>
+      <td>€48,035</td>
+      <td>€4,003</td>
+      <td>50.1%</td>
+      <td>60.0%</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>€100,000</td>
+      <td>€117,959</td>
+      <td>€58,014</td>
+      <td>€4,835</td>
+      <td>49.2%</td>
+      <td>58.0%</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>€120,000</td>
+      <td>€138,107</td>
+      <td>€68,528</td>
+      <td>€5,711</td>
+      <td>49.6%</td>
+      <td>57.1%</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>€150,000</td>
+      <td>€168,107</td>
+      <td>€84,836</td>
+      <td>€7,070</td>
+      <td>50.5%</td>
+      <td>56.6%</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>€200,000</td>
+      <td>€218,107</td>
+      <td>€112,681</td>
+      <td>€9,390</td>
+      <td>51.7%</td>
+      <td>56.3%</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>€300,000</td>
+      <td>€318,107</td>
+      <td>€168,246</td>
+      <td>€14,020</td>
+      <td>52.9%</td>
+      <td>56.1%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 5 =====
+[stdout]
+Best in range:    60.9%  at €   24,000 gross  (€29,076 cost)
+Worst in range:   49.1%  at €  101,400 gross  (€119,507 cost)
+At the top end:   52.9%  at €  300,000 gross  (€318,107 cost)
+
+The dip is worth 11.8 percentage points of everything the employer spends.
+
+===== cell 6 =====
+[text/plain]
+<Figure size 1600x600 with 2 Axes>

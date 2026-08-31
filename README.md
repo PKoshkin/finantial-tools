@@ -127,6 +127,31 @@ year's tax settlement falls beyond the horizon and is dropped — conservative
 for a refund, but for a profitable flat it means the last year's rental tax is
 never charged.
 
+### One year, without a forecast
+
+Not every question needs a simulation. `src/model/german_tax.py` holds the
+German rules as pure functions over plain numbers, and `employee_year` runs the
+whole chain for a single calendar year — from what an employee costs the
+employer down to what the year is finally worth:
+
+```python
+from src.model.german_tax import TaxSystem, employee_year
+
+year = employee_year(100_000, TaxSystem())     # single, childless, statutory
+year.employer_cost                             # 117,958.63
+year.net                                       #  58,014.36
+year.take_home_share                           #       0.4918
+```
+
+Married, with children, privately insured or on another Steuerklasse are
+keyword arguments; `GermanHousehold` runs the same arithmetic inside the engine
+and the two are pinned against each other in the tests. Two cautions. The
+employer cost covers the four social insurance branches only — the Umlagen
+U1/U2, the Insolvenzgeldumlage and the accident insurance are not modelled, so
+a real employer pays another one to two percent of the gross. And `net` is what
+the year is worth once the tax return has settled, while `net_paid_out` is the
+twelve payslips; `refund` is the difference between them.
+
 ### How a yearly rate becomes a monthly one
 
 Every yearly rate that the simulation needs monthly says which convention it is
@@ -225,6 +250,7 @@ All notebooks build the same kind of model and differ only in components:
 - `sondertilgung_vs_etf.ipynb` — extra mortgage repayments vs ETF, breakeven ETF rate, early-repayment penalty, MSCI World stats
 - `buy_as_investment_vs_etf.ipynb` — buy-to-let vs ETF-only
 - `etf_withdrawal.ipynb` — ETF accumulation with a yearly percentage withdrawal
+- `take_home_share.ipynb` — net pay as a share of total employer cost, across the German salary range
 
 ## Tests
 
