@@ -7,11 +7,16 @@ examples derived from them, so these tests are an independent check on the
 implementation, not a snapshot of its own output.
 """
 
+import math
+
 import pytest
 from src.model.german_tax import (
     EarnerFigures,
+    SocialContributions,
     TaxSystem,
     assessed_tax,
+    basisrente_cap,
+    basisrente_deduction,
     employee_year,
     employer_contributions,
     income_tax,
@@ -216,7 +221,9 @@ class TestInertia:
         assert drifted.zone3_end == pytest.approx(69_878 * 1.025**4)
         assert drifted.bbg_pension == pytest.approx(101_400 * 1.033**4)
         assert drifted.bbg_health == pytest.approx(69_750 * 1.033**4)
+        assert drifted.bbg_knappschaft == pytest.approx(124_800 * 1.033**4)
         assert drifted.child_benefit_monthly == pytest.approx(259 * 1.025**4)
+        assert drifted.pension_allowance == SYSTEM.pension_allowance
 
     def test_rates_never_drift(self):
         drifted = SYSTEM.for_year(10)
@@ -234,6 +241,68 @@ class TestInertia:
         # More generous borders: the same income owes less tax than today.
         assert income_tax(100_000, drifted) < income_tax(100_000, SYSTEM)
         assert income_tax(drifted.basic_allowance, drifted) == 0.0
+
+
+class TestBasisrente:
+    """§10 Abs. 3 for a Basisrente, and pension income at assessment."""
+
+    def statutory(self, gross: float) -> EarnerFigures:
+        social = social_contributions(gross, SYSTEM, n_children=0, private_health=False)
+        return EarnerFigures(yearly_gross=gross, social=social)
+
+    def test_the_2026_cap(self):
+        # 24.7% of the 124,800 EUR knappschaft ceiling, rounded up.
+        assert basisrente_cap(SYSTEM, joint=False) == 30_826.0
+        assert basisrente_cap(SYSTEM, joint=True) == 61_652.0
+
+    def test_the_2024_cap_is_the_figure_the_offer_quotes(self):
+        system = TaxSystem(bbg_knappschaft=111_600.0)
+        assert basisrente_cap(system, joint=False) == 27_566.0
+        assert basisrente_cap(system, joint=True) == 55_132.0
+
+    def test_the_cap_drifts_with_wages(self):
+        drifted = SYSTEM.for_year(10)
+        assert basisrente_cap(drifted, joint=False) == float(
+            math.ceil(0.247 * 124_800 * 1.033**10)
+        )
+
+    def test_the_statutory_contributions_eat_the_room_first(self):
+        earner = self.statutory(80_000.0)
+        room = 30_826.0 - 2.0 * earner.social.pension
+        assert room == pytest.approx(30_826.0 - 14_880.0)
+        deduct = basisrente_deduction([earner], SYSTEM, joint=False, contributions=6_000.0)
+        assert deduct == 6_000.0
+        capped = basisrente_deduction([earner], SYSTEM, joint=False, contributions=50_000.0)
+        assert capped == pytest.approx(room)
+
+    def test_the_deduction_lowers_the_zve_one_for_one(self):
+        earner = self.statutory(80_000.0)
+        plain = taxable_income([earner], SYSTEM, joint=False)
+        deducted = taxable_income([earner], SYSTEM, joint=False, basisrente_contributions=6_000.0)
+        assert plain - deducted == pytest.approx(6_000.0)
+
+    def test_zero_new_arguments_change_nothing(self):
+        earners = [self.statutory(80_000.0), self.statutory(45_000.0)]
+        plain = taxable_income(earners, SYSTEM, joint=True, other_income=-3_000.0)
+        explicit = taxable_income(
+            earners,
+            SYSTEM,
+            joint=True,
+            other_income=-3_000.0,
+            pension_income=0.0,
+            basisrente_contributions=0.0,
+        )
+        assert explicit == plain
+
+    def test_a_pension_is_income_after_its_allowance(self):
+        nobody = EarnerFigures(yearly_gross=0.0, social=SocialContributions(0.0, 0.0, 0.0, 0.0))
+        zve = taxable_income([nobody], SYSTEM, joint=False, pension_income=30_000.0)
+        assert zve == pytest.approx(30_000.0 - 102.0 - 36.0)
+        assert taxable_income([], SYSTEM, joint=True, pension_income=30_000.0) == pytest.approx(
+            30_000.0 - 102.0 - 72.0
+        )
+        # The allowance never turns a small pension into a loss.
+        assert taxable_income([], SYSTEM, joint=False, pension_income=50.0) == 0.0
 
 
 class TestOtherVorsorgeCap:

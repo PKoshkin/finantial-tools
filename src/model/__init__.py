@@ -70,6 +70,14 @@ Model semantics — the details that decide what the numbers mean:
   `GermanHousehold`, which re-assesses the year's income tax with it — the
   cash effect rides the July refund of the following year. Losses offset wage
   income within their year only (no Verlustvortrag).
+- Basisrente: a `RuerupPension` takes its contribution out of the leftover
+  like a fixed `Etf` contribution (so `monthly_invested` counts it), but its
+  value never joins `etf_capital` — it can only ever become a pension. Once
+  a contract exists, a year's growth of `etf_capital` therefore falls short
+  of `12 * monthly_invested` by the contributions. The household deducts
+  the contributions within the §10 Abs. 3 cap at assessment, so the saving
+  arrives with the next July refund; from Rentenbeginn the pension is paid
+  in its own `PENSION` cash phase and taxed in full the same way.
 - Insurance deductions: the unemployment contribution counts toward payroll
   and assessment only as far as it fits the 1,900 € bucket (§10 Abs. 4) next
   to the health-and-care deduction — irrelevant on a statutory wage, decisive
@@ -114,6 +122,9 @@ from .components import (
     PrivateHealthInsurance,
     Rent,
     RentalTaxation,
+    RuerupAnnuity,
+    RuerupCosts,
+    RuerupPension,
     Salary,
     Spending,
 )
@@ -148,6 +159,9 @@ __all__ = [
     "PrivateHealthInsurance",
     "Rent",
     "RentalTaxation",
+    "RuerupAnnuity",
+    "RuerupCosts",
+    "RuerupPension",
     "Salary",
     "SetupContext",
     "Spending",

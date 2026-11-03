@@ -1,0 +1,563 @@
+===== cell 2 =====
+[stdout]
+Statutory pensions, both of you, in today's money: €6,029 a month
+
+===== cell 3 =====
+[stdout]
+Largest deviation in this table: 0.071%
+
+[text/plain]
+         0% (insurer / model)     3% (insurer / model)  \
+year                                                     
+1     €    4,549 / €    4,552  €    4,611 / €    4,614   
+5     €   22,570 / €   22,577  €   24,288 / €   24,295   
+10    €   50,493 / €   50,500  €   58,127 / €   58,135   
+20    €  104,691 / €  104,698  €  140,273 / €  140,284   
+30    €  156,764 / €  156,770  €  246,341 / €  246,355   
+39    €  201,881 / €  201,887  €  367,974 / €  367,991   
+
+         7% (insurer / model)     9% (insurer / model)  
+year                                                    
+1     €    4,693 / €    4,696  €    4,733 / €    4,736  
+5     €   26,767 / €   26,775  €   28,092 / €   28,101  
+10    €   70,443 / €   70,455  €   77,678 / €   77,691  
+20    €  213,037 / €  213,059  €  265,247 / €  265,276  
+30    €  482,541 / €  482,581  €  691,876 / €  691,942  
+39    €  925,194 / €  925,264  €1,525,634 / €1,525,773  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0% (insurer / model)</th>
+      <th>3% (insurer / model)</th>
+      <th>7% (insurer / model)</th>
+      <th>9% (insurer / model)</th>
+    </tr>
+    <tr>
+      <th>year</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>€&nbsp;&nbsp;&nbsp;&nbsp;4,549 / €&nbsp;&nbsp;&nbsp;&nbsp;4,552</td>
+      <td>€&nbsp;&nbsp;&nbsp;&nbsp;4,611 / €&nbsp;&nbsp;&nbsp;&nbsp;4,614</td>
+      <td>€&nbsp;&nbsp;&nbsp;&nbsp;4,693 / €&nbsp;&nbsp;&nbsp;&nbsp;4,696</td>
+      <td>€&nbsp;&nbsp;&nbsp;&nbsp;4,733 / €&nbsp;&nbsp;&nbsp;&nbsp;4,736</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>€&nbsp;&nbsp; 22,570 / €&nbsp;&nbsp; 22,577</td>
+      <td>€&nbsp;&nbsp; 24,288 / €&nbsp;&nbsp; 24,295</td>
+      <td>€&nbsp;&nbsp; 26,767 / €&nbsp;&nbsp; 26,775</td>
+      <td>€&nbsp;&nbsp; 28,092 / €&nbsp;&nbsp; 28,101</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>€&nbsp;&nbsp; 50,493 / €&nbsp;&nbsp; 50,500</td>
+      <td>€&nbsp;&nbsp; 58,127 / €&nbsp;&nbsp; 58,135</td>
+      <td>€&nbsp;&nbsp; 70,443 / €&nbsp;&nbsp; 70,455</td>
+      <td>€&nbsp;&nbsp; 77,678 / €&nbsp;&nbsp; 77,691</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>€&nbsp;&nbsp;104,691 / €&nbsp;&nbsp;104,698</td>
+      <td>€&nbsp;&nbsp;140,273 / €&nbsp;&nbsp;140,284</td>
+      <td>€&nbsp;&nbsp;213,037 / €&nbsp;&nbsp;213,059</td>
+      <td>€&nbsp;&nbsp;265,247 / €&nbsp;&nbsp;265,276</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>€&nbsp;&nbsp;156,764 / €&nbsp;&nbsp;156,770</td>
+      <td>€&nbsp;&nbsp;246,341 / €&nbsp;&nbsp;246,355</td>
+      <td>€&nbsp;&nbsp;482,541 / €&nbsp;&nbsp;482,581</td>
+      <td>€&nbsp;&nbsp;691,876 / €&nbsp;&nbsp;691,942</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>€&nbsp;&nbsp;201,881 / €&nbsp;&nbsp;201,887</td>
+      <td>€&nbsp;&nbsp;367,974 / €&nbsp;&nbsp;367,991</td>
+      <td>€&nbsp;&nbsp;925,194 / €&nbsp;&nbsp;925,264</td>
+      <td>€1,525,634 / €1,525,773</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 4 =====
+[text/plain]
+  market return capital at 67 pension, guaranteed pension, 2024 basis  \
+0            2%      €276,104                €587              €1,120   
+1            3%      €339,331                €721              €1,377   
+2            4%      €420,864                €894              €1,708   
+3            5%      €526,447              €1,119              €2,136   
+4            6%      €663,669              €1,410              €2,693   
+5            7%      €842,570              €1,790              €3,419   
+6            8%    €1,076,425              €2,287              €4,368   
+
+  2024 basis, today's €  
+0                  €530  
+1                  €651  
+2                  €807  
+3                €1,010  
+4                €1,273  
+5                €1,616  
+6                €2,065  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>market return</th>
+      <th>capital at 67</th>
+      <th>pension, guaranteed</th>
+      <th>pension, 2024 basis</th>
+      <th>2024 basis, today's €</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2%</td>
+      <td>€276,104</td>
+      <td>€587</td>
+      <td>€1,120</td>
+      <td>€530</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3%</td>
+      <td>€339,331</td>
+      <td>€721</td>
+      <td>€1,377</td>
+      <td>€651</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4%</td>
+      <td>€420,864</td>
+      <td>€894</td>
+      <td>€1,708</td>
+      <td>€807</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5%</td>
+      <td>€526,447</td>
+      <td>€1,119</td>
+      <td>€2,136</td>
+      <td>€1,010</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6%</td>
+      <td>€663,669</td>
+      <td>€1,410</td>
+      <td>€2,693</td>
+      <td>€1,273</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>7%</td>
+      <td>€842,570</td>
+      <td>€1,790</td>
+      <td>€3,419</td>
+      <td>€1,616</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>8%</td>
+      <td>€1,076,425</td>
+      <td>€2,287</td>
+      <td>€4,368</td>
+      <td>€2,065</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 5 =====
+[text/plain]
+                                         capital at 67 this layer takes
+0                        no costs at all      €702,972                 
+1  + 2.5% acquisition cost, over 5 years      €668,097          €34,876
+2           + 4.5% of every contribution      €636,463          €31,634
+3          + 0.40% a year on the capital      €577,109          €59,354
+4          + the funds' own 0.38% a year      €526,447          €50,662
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>capital at 67</th>
+      <th>this layer takes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>no costs at all</td>
+      <td>€702,972</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>+ 2.5% acquisition cost, over 5 years</td>
+      <td>€668,097</td>
+      <td>€34,876</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>+ 4.5% of every contribution</td>
+      <td>€636,463</td>
+      <td>€31,634</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>+ 0.40% a year on the capital</td>
+      <td>€577,109</td>
+      <td>€59,354</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>+ the funds' own 0.38% a year</td>
+      <td>€526,447</td>
+      <td>€50,662</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 6 =====
+[stdout]
+Paid in over 39 years:   €234,000
+Capital at 67, at 5%:   €526,447
+Effective return:        3.78% a year, 1.22 points of costs (the PIB states 1.23)
+
+===== cell 8 =====
+[text/plain]
+market return                        3%              5%              7%
+tax refunds              €109,461 (47%)  €109,461 (47%)  €109,461 (47%)
+Rürup capital at 67            €339,331        €526,447        €842,570
+extra ETF capital at 67        €229,326        €370,514        €616,413
+net pension, guaranteed            €468            €725          €1,156
+break-even, guaranteed        after 100       after 100       after 100
+net pension, 2024 basis            €891          €1,376          €2,185
+break-even, 2024 basis             95.1       after 100       after 100
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>market return</th>
+      <th>3%</th>
+      <th>5%</th>
+      <th>7%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>tax refunds</th>
+      <td>€109,461 (47%)</td>
+      <td>€109,461 (47%)</td>
+      <td>€109,461 (47%)</td>
+    </tr>
+    <tr>
+      <th>Rürup capital at 67</th>
+      <td>€339,331</td>
+      <td>€526,447</td>
+      <td>€842,570</td>
+    </tr>
+    <tr>
+      <th>extra ETF capital at 67</th>
+      <td>€229,326</td>
+      <td>€370,514</td>
+      <td>€616,413</td>
+    </tr>
+    <tr>
+      <th>net pension, guaranteed</th>
+      <td>€468</td>
+      <td>€725</td>
+      <td>€1,156</td>
+    </tr>
+    <tr>
+      <th>break-even, guaranteed</th>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>net pension, 2024 basis</th>
+      <td>€891</td>
+      <td>€1,376</td>
+      <td>€2,185</td>
+    </tr>
+    <tr>
+      <th>break-even, 2024 basis</th>
+      <td>95.1</td>
+      <td>after 100</td>
+      <td>after 100</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 9 =====
+[text/plain]
+<Figure size 1200x600 with 1 Axes>
+===== cell 10 =====
+[text/plain]
+    statutory pensions                   tariff 3%: tax / break-even  \
+0  100% of placeholder     tariff creeps (2.5%)           35% / 95.1   
+1  100% of placeholder  tariff moves with wages           31% / 91.5   
+2   50% of placeholder     tariff creeps (2.5%)           27% / 90.1   
+3   50% of placeholder  tariff moves with wages           24% / 88.8   
+
+  5%: tax / break-even 7%: tax / break-even  
+0      36% / after 100      36% / after 100  
+1      31% / after 100      31% / after 100  
+2      27% / after 100      28% / after 100  
+3           25% / 98.0      25% / after 100  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>statutory pensions</th>
+      <th>tariff</th>
+      <th>3%: tax / break-even</th>
+      <th>5%: tax / break-even</th>
+      <th>7%: tax / break-even</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>100% of placeholder</td>
+      <td>tariff creeps (2.5%)</td>
+      <td>35% / 95.1</td>
+      <td>36% / after 100</td>
+      <td>36% / after 100</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>100% of placeholder</td>
+      <td>tariff moves with wages</td>
+      <td>31% / 91.5</td>
+      <td>31% / after 100</td>
+      <td>31% / after 100</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>50% of placeholder</td>
+      <td>tariff creeps (2.5%)</td>
+      <td>27% / 90.1</td>
+      <td>27% / after 100</td>
+      <td>28% / after 100</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>50% of placeholder</td>
+      <td>tariff moves with wages</td>
+      <td>24% / 88.8</td>
+      <td>25% / 98.0</td>
+      <td>25% / after 100</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 11 =====
+[stdout]
+Deduction room left in 2026: €22,172 a year, €1,848 a month
+
+[text/plain]
+               tax saved in 2026, per € 3%: pension 3%: extra ETF at 67  \
+top-up / month                                                            
+€250                              42.0%        €659            €110,448   
+€500                              42.0%      €1,317            €221,536   
+€1,000                            41.7%      €2,634            €445,466   
+€1,500                            41.3%      €3,952            €671,822   
+€1,848                            40.9%      €4,868            €830,789   
+€2,500                            30.2%      €6,586          €1,166,855   
+
+               3%: break-even 5%: pension 5%: extra ETF at 67 5%: break-even  
+top-up / month                                                                
+€250                     95.7      €1,007            €176,534      after 100  
+€500                     96.0      €2,013            €354,241      after 100  
+€1,000                   96.5      €4,026            €712,769      after 100  
+€1,500                   97.1      €6,039          €1,075,536      after 100  
+€1,848                   97.5      €7,440          €1,330,480      after 100  
+€2,500                   99.7     €10,065          €1,881,252      after 100  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tax saved in 2026, per €</th>
+      <th>3%: pension</th>
+      <th>3%: extra ETF at 67</th>
+      <th>3%: break-even</th>
+      <th>5%: pension</th>
+      <th>5%: extra ETF at 67</th>
+      <th>5%: break-even</th>
+    </tr>
+    <tr>
+      <th>top-up / month</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>€250</th>
+      <td>42.0%</td>
+      <td>€659</td>
+      <td>€110,448</td>
+      <td>95.7</td>
+      <td>€1,007</td>
+      <td>€176,534</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>€500</th>
+      <td>42.0%</td>
+      <td>€1,317</td>
+      <td>€221,536</td>
+      <td>96.0</td>
+      <td>€2,013</td>
+      <td>€354,241</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>€1,000</th>
+      <td>41.7%</td>
+      <td>€2,634</td>
+      <td>€445,466</td>
+      <td>96.5</td>
+      <td>€4,026</td>
+      <td>€712,769</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>€1,500</th>
+      <td>41.3%</td>
+      <td>€3,952</td>
+      <td>€671,822</td>
+      <td>97.1</td>
+      <td>€6,039</td>
+      <td>€1,075,536</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>€1,848</th>
+      <td>40.9%</td>
+      <td>€4,868</td>
+      <td>€830,789</td>
+      <td>97.5</td>
+      <td>€7,440</td>
+      <td>€1,330,480</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>€2,500</th>
+      <td>30.2%</td>
+      <td>€6,586</td>
+      <td>€1,166,855</td>
+      <td>99.7</td>
+      <td>€10,065</td>
+      <td>€1,881,252</td>
+      <td>after 100</td>
+    </tr>
+  </tbody>
+</table>
+</div>

@@ -70,6 +70,7 @@ class CashPhase(IntEnum):
     """
 
     INCOME = 10
+    PENSION = 15
     RENTAL_INCOME = 20
     OPERATING_COSTS = 25
     SPENDING = 30
@@ -134,6 +135,8 @@ class YearContext:
     year: int  # 1..years
     released: list[float] = field(default_factory=list)
     taxable_incomes: list[float] = field(default_factory=list)
+    basisrente_contributions: list[float] = field(default_factory=list)
+    pension_incomes: list[float] = field(default_factory=list)
 
     def release(self, amount: float) -> None:
         """Hand cash back to the sink at year end (unused Sondertilgung)."""
@@ -147,6 +150,24 @@ class YearContext:
         order cannot change who sees what.
         """
         self.taxable_incomes.append(amount)
+
+    def add_basisrente_contribution(self, amount: float) -> None:
+        """Announce a year's Basisrente contributions (§10 Abs. 1 Nr. 2 b EStG).
+
+        Altersvorsorgeaufwendungen: the taxpayer deducts them at assessment,
+        within the §10 Abs. 3 cap they share with the statutory pension
+        contributions — never at payroll. Same stages as `add_taxable_income`.
+        """
+        self.basisrente_contributions.append(amount)
+
+    def add_pension_income(self, amount: float) -> None:
+        """Announce a year's taxable Leibrente (§22 Nr. 1 S. 3 a aa EStG).
+
+        Kept apart from `add_taxable_income` because pension income has its
+        own Werbungskosten-Pauschbetrag, and so that the household's rental
+        column keeps meaning rental income only.
+        """
+        self.pension_incomes.append(amount)
 
 
 class FinancialComponent:
@@ -174,7 +195,11 @@ class FinancialComponent:
 
     @property
     def produces_taxable_income(self) -> bool:
-        """True when this component will call `ctx.add_taxable_income`."""
+        """True when this component publishes anything the taxpayer assesses.
+
+        Rental results, Basisrente contributions, pension income — every
+        `ctx.add_*` channel needs a `GermanHousehold` to consume it.
+        """
         return False
 
     # --- t = 0 -----------------------------------------------------------
@@ -189,6 +214,9 @@ class FinancialComponent:
     def initial_cash(self, state: Any) -> float:
         """Cash this component brings into the model at t=0."""
         return 0.0
+
+    def seal_basis(self, state: Any) -> None:
+        """Components that absorb cash: called once every t=0 draw is applied."""
 
     def report_initial(self, state: Any) -> dict[str, float]:
         """Columns for the year-0 row (state right after the purchase)."""

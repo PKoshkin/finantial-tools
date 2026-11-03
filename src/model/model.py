@@ -418,9 +418,9 @@ def _check_taxable_income(
         component.absorbs_taxable_income for component in components
     ):
         raise ValueError(
-            f"component(s) {', '.join(producers)} declare rental taxation but the "
-            "model has no GermanHousehold to assess it; add one or drop the "
-            "taxation parameter"
+            f"component(s) {', '.join(producers)} publish taxable results (rental "
+            "taxation, a Basisrente) but the model has no GermanHousehold to assess "
+            "them; add one, or drop the rental taxation parameter"
         )
 
 

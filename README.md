@@ -68,6 +68,7 @@ df = model.run()
 | `Home` — the place you live in | 0 or 1 | `price`, `yearly_price_increase_rate`, `mortgage` |
 | `InvestmentProperty` — bought to rent out | any | the above plus `monthly_rental_income`, `yearly_rental_income_increase_rate`, `operating_costs`, `vacancy_rate`, `taxation` |
 | `Etf` — a portfolio | any | `initial_capital`, `yearly_return_rate`, `tax_rate`, `monthly_investment`, `yearly_withdrawal_rate`, `compounding` |
+| `RuerupPension` — a Basisrente | any | `monthly_contribution`, `contribution_months`, `yearly_return_rate`, `elapsed_months`, `initial_value`, `costs` (`RuerupCosts`), `annuity` (`RuerupAnnuity`), `compounding` |
 
 Every component also takes a `name`, which prefixes its own result columns.
 
@@ -126,6 +127,51 @@ losses only offset income within their year (no Verlustvortrag); and the final
 year's tax settlement falls beyond the horizon and is dropped — conservative
 for a refund, but for a profitable flat it means the last year's rental tax is
 never charged.
+
+### Basisrente (Rürup)
+
+A `RuerupPension` is a fondsgebundene Basisrente: a monthly contribution goes
+in, the insurer's costs come out, the rest follows the funds, and at
+Rentenbeginn the value becomes a lifelong pension — never cash, so it stays
+out of `etf_capital` and reports only its own `ruerup.*` columns.
+
+```python
+RuerupPension(
+    monthly_contribution=500,
+    contribution_months=468,                # the last contribution; the pension starts next month
+    yearly_return_rate=0.06,                # the funds' own growth, after their TER
+    elapsed_months=14,                      # contract months before the model start
+    initial_value=None,                     # Vertragswert at the start; None rebuilds it
+    costs=RuerupCosts(acquisition_rate=0.025, acquisition_months=60,
+                      contribution_rate=0.045, capital_rate=0.004),
+    annuity=RuerupAnnuity(factor=24.996271, bonus_rate=0.0187),  # 2024 basis, not guaranteed
+)
+```
+
+Each month the value grows, loses `capital_rate / 12`, and takes the
+contribution minus `contribution_rate` and, during the first
+`acquisition_months`, an equal slice of the acquisition cost
+(`acquisition_rate` of the agreed contribution sum). That recursion
+reproduces a real NÜRNBERGER contract's tabulated values to within 20 € in
+the early years and 0.015% after 39 (`tests/test_ruerup.py`). The pension is `capital * (factor / 10_000
++ bonus_rate / 12)` a month; the default `factor` is the tariff's guaranteed
+21.246830.
+
+The model needs a `GermanHousehold`, which deducts the contributions within
+the §10 Abs. 3 cap (`basisrente_cap`: 30,826 € per person in 2026, shared
+with both halves of the statutory pension contribution). A Basisrente is not
+part of payroll, so the saving arrives as next July's refund. The pension is
+taxed in full: the Besteuerungsanteil is 100% from a 2058 Rentenbeginn on.
+A rise in the contribution is a second `RuerupPension` for the extra amount,
+ending in the same month, which is how the insurer books it.
+
+Deliberate simplifications: no Beitragsfreistellung, no early or late
+Rentenbeginn, no survivors' pension, no health contributions on the pension,
+deterministic returns (so no kursorientiertes Ablaufmanagement). The
+household never retires: a pension paid inside the horizon is taxed on top of
+running salaries and settled a year late. For the payout phase, use
+`taxable_income([], system, joint=..., pension_income=...)`, the zvE of a
+retired tax unit, as `notebook/ruerup_vs_etf.ipynb` does.
 
 ### One year, without a forecast
 
@@ -251,6 +297,7 @@ All notebooks build the same kind of model and differ only in components:
 - `buy_as_investment_vs_etf.ipynb` — buy-to-let vs ETF-only
 - `etf_withdrawal.ipynb` — ETF accumulation with a yearly percentage withdrawal
 - `take_home_share.ipynb` — net pay as a share of total employer cost, across the German salary range
+- `ruerup_vs_etf.ipynb` — a real Basisrente contract: what it yields, the same money in an ETF, the break-even age, how much to contribute
 
 ## Tests
 

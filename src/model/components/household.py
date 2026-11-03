@@ -29,6 +29,16 @@ the effect — a refund for a rental loss, a back-payment for a profit — rides
 the same July channel as the wage over-withholding. Losses only offset income
 within their year; whatever pushes the zvE below zero is forfeited (no
 Verlustvortrag).
+
+A `RuerupPension` publishes two things the same way. Its contributions are
+deducted within the §10 Abs. 3 cap — at assessment only, since a
+Basisrente is not part of the payroll Vorsorgepauschale and cannot be put
+on the ELStAM as a Freibetrag — so the tax they save arrives as next July's
+refund, exactly as it does in real life. Its pension joins the zvE as
+taxable Leibrente; nothing is withheld at source, so the tax on it is
+settled through the same channel, a year late (the model has no
+Vorauszahlungen). The household never retires: salaries keep running, and a
+pension paid inside the horizon is taxed on top of them.
 """
 
 from __future__ import annotations
@@ -51,6 +61,7 @@ from ..german_tax import (
     EarnerFigures,
     TaxSystem,
     assessed_tax,
+    basisrente_deduction,
     private_deductible,
     private_subsidy,
     social_contributions,
@@ -126,6 +137,8 @@ class HouseholdState:
     yearly_assessed: float = 0.0
     yearly_social: float = 0.0
     yearly_rental_result: float = 0.0
+    yearly_basisrente_deduction: float = 0.0
+    yearly_pension_income: float = 0.0
     figures: list[EarnerFigures] = field(default_factory=list)
 
 
@@ -282,6 +295,8 @@ class GermanHousehold(FinancialComponent):
         state.yearly_assessed = assessment.total
         state.yearly_social = social_total
         state.yearly_rental_result = 0.0
+        state.yearly_basisrente_deduction = 0.0
+        state.yearly_pension_income = 0.0
         state.figures = figures
 
     def year_begin(self, state: HouseholdState, ctx: YearContext) -> None:
@@ -296,24 +311,43 @@ class GermanHousehold(FinancialComponent):
         return (CashFlow(CashPhase.INCOME, state.monthly_net),)
 
     def year_assess(self, state: HouseholdState, ctx: YearContext) -> None:
-        """Fold the year's rental results into the assessed tax.
+        """Fold the year's published results into the assessed tax.
 
-        Runs at stage A2, after every property published its result in
-        `year_settle` and before the row is reported — so the reported
+        Runs at stage A2, after every component published in `year_settle`
+        and before the row is reported — so the reported
         `yearly_assessed_tax` and the `refund_due` computed in `year_grow`
-        both include the rental effect. `_refresh` next January resets the
-        assessment to wage-only before the next round. When nothing was
-        published the wage-only assessment stands untouched, bit for bit.
+        both include the rental result, the Basisrente deduction and the
+        pension income. `_refresh` next January resets the assessment to
+        wage-only before the next round. When nothing was published the
+        wage-only assessment stands untouched, bit for bit.
         """
-        if not ctx.taxable_incomes:
+        if not (ctx.taxable_incomes or ctx.basisrente_contributions or ctx.pension_incomes):
             return
         rental = 0.0
         for amount in ctx.taxable_incomes:
             rental += amount
+        pension = 0.0
+        for amount in ctx.pension_incomes:
+            pension += amount
+        contributions = 0.0
+        for amount in ctx.basisrente_contributions:
+            contributions += amount
         state.yearly_rental_result = rental
+        state.yearly_pension_income = pension
         system = self.tax.for_year(state.year_index)
+        if contributions > 0.0:
+            state.yearly_basisrente_deduction = basisrente_deduction(
+                state.figures, system, joint=self.joint, contributions=contributions
+            )
         assessment = assessed_tax(
-            taxable_income(state.figures, system, joint=self.joint, other_income=rental),
+            taxable_income(
+                state.figures,
+                system,
+                joint=self.joint,
+                other_income=rental,
+                pension_income=pension,
+                basisrente_contributions=contributions,
+            ),
             system,
             joint=self.joint,
             n_children=self.n_children,
@@ -346,4 +380,6 @@ class GermanHousehold(FinancialComponent):
             "yearly_refund_received": state.refund_due,
             "yearly_social_contributions": state.yearly_social,
             "yearly_rental_result": state.yearly_rental_result,
+            "yearly_basisrente_deduction": state.yearly_basisrente_deduction,
+            "yearly_pension_income": state.yearly_pension_income,
         }

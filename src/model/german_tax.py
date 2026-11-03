@@ -69,12 +69,15 @@ class TaxSystem:
     per_child_discount: float = 0.0025  # employee-only, children #2..#5
     bbg_pension: float = 101_400.0  # Beitragsbemessungsgrenze RV/AV, yearly
     bbg_health: float = 69_750.0  # Beitragsbemessungsgrenze KV/PV, yearly
+    bbg_knappschaft: float = 124_800.0  # knappschaftliche RV, yearly; sets the §10 Abs. 3 cap
 
     # --- assessment deductions -------------------------------------------
     employee_allowance: float = 1_230.0  # Arbeitnehmer-Pauschbetrag, per earner
     special_expenses_allowance: float = 36.0  # Sonderausgaben-Pauschbetrag, doubled jointly
     krankengeld_reduction: float = 0.04  # deductible health contribution is 96%
     other_vorsorge_cap: float = 1_900.0  # §10 Abs. 4 bucket; fixed by law, does not drift
+    knappschaft_rv_rate: float = 0.247  # its contribution rate; the cap is this times its BBG
+    pension_allowance: float = 102.0  # Werbungskosten-Pauschbetrag on pensions; does not drift
 
     # --- Solidaritätszuschlag ---------------------------------------------
     soli_rate: float = 0.055
@@ -124,6 +127,7 @@ class TaxSystem:
             ),
             bbg_pension=self.bbg_pension * w,
             bbg_health=self.bbg_health * w,
+            bbg_knappschaft=self.bbg_knappschaft * w,
             employee_allowance=self.employee_allowance * t,
             special_expenses_allowance=self.special_expenses_allowance * t,
             soli_allowance=self.soli_allowance * t,
@@ -355,12 +359,51 @@ class EarnerFigures:
     private_deductible: float = 0.0
 
 
+def basisrente_cap(system: TaxSystem, *, joint: bool) -> float:
+    """The §10 Abs. 3 Höchstbetrag for Altersvorsorgeaufwendungen.
+
+    The maximum contribution to the knappschaftliche Rentenversicherung,
+    rounded up to a full euro as the statute says — 27,566 EUR in 2024 (the
+    figure a 2024 Basisrente offer quotes), 30,826 EUR in 2026 — and doubled
+    for a jointly assessed couple, whichever spouse pays.
+    """
+    cap = float(math.ceil(system.knappschaft_rv_rate * system.bbg_knappschaft))
+    return cap * (2.0 if joint else 1.0)
+
+
+def basisrente_deduction(
+    earners: Sequence[EarnerFigures],
+    system: TaxSystem,
+    *,
+    joint: bool,
+    contributions: float,
+) -> float:
+    """The part of a year's Basisrente contributions the cap lets through.
+
+    §10 Abs. 3 puts both halves of the statutory pension contribution and the
+    Basisrente under one cap, then takes the tax-free employer half back out.
+    The employee half is deducted in full anyway — both halves stay far below
+    the cap, because 18.6% of the RV ceiling is less than 24.7% of the
+    knappschaft one and the two ceilings drift together — so the Basisrente
+    gets whatever room the statutory contributions leave. The employer half
+    equals the employee half to the bit: `employer_contributions` computes
+    the same expression.
+    """
+    statutory = 0.0
+    for earner in earners:
+        statutory += 2.0 * earner.social.pension
+    room = basisrente_cap(system, joint=joint) - statutory
+    return min(contributions, max(room, 0.0))
+
+
 def taxable_income(
     earners: Sequence[EarnerFigures],
     system: TaxSystem,
     *,
     joint: bool,
     other_income: float = 0.0,
+    pension_income: float = 0.0,
+    basisrente_contributions: float = 0.0,
 ) -> float:
     """From gross wages to the zu versteuerndes Einkommen of one tax unit.
 
@@ -376,6 +419,15 @@ def taxable_income(
     but whatever pushes the zvE below zero is forfeited — this model has no
     Verlustvortrag.
 
+    `pension_income` is a year's taxable Leibrente (§22 Nr. 1 S. 3 a aa),
+    less the 102 EUR Werbungskosten-Pauschbetrag. The statute grants that
+    allowance per person; it is applied once here, which is exact while the
+    pensions belong to one spouse. With no earners at all this is the zvE of
+    a retired tax unit.
+
+    `basisrente_contributions` are deducted as far as `basisrente_deduction`
+    lets them through the §10 Abs. 3 cap.
+
     The unemployment contribution counts as far as it still fits the
     1,900 EUR bucket (§10 Abs. 4) next to the earner's health-and-care
     deduction — full on a statutory wage, so only a small private premium
@@ -387,6 +439,8 @@ def taxable_income(
     for earner in earners:
         zve += max(earner.yearly_gross - system.employee_allowance, 0.0)
     zve += other_income
+    if pension_income > 0.0:
+        zve += max(pension_income - system.pension_allowance, 0.0)
     for earner in earners:
         zve -= earner.social.pension
         zve -= earner.social.health * (1.0 - system.krankengeld_reduction)
@@ -400,6 +454,10 @@ def taxable_income(
         room = system.other_vorsorge_cap - basis
         if room > 0.0:
             zve -= min(earner.social.unemployment, room)
+    if basisrente_contributions > 0.0:
+        zve -= basisrente_deduction(
+            earners, system, joint=joint, contributions=basisrente_contributions
+        )
     zve -= system.special_expenses_allowance * (2.0 if joint else 1.0)
     return max(zve, 0.0)
 

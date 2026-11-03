@@ -4,6 +4,7 @@ from .etf import REMAINDER, Etf
 from .household import Earner, GermanHousehold, PrivateHealthInsurance
 from .income import Salary
 from .property import Home, InvestmentProperty, Mortgage, OperatingCosts, RentalTaxation
+from .ruerup import RuerupAnnuity, RuerupCosts, RuerupPension
 from .spending import Rent, Spending
 
 __all__ = [
@@ -18,6 +19,9 @@ __all__ = [
     "PrivateHealthInsurance",
     "Rent",
     "RentalTaxation",
+    "RuerupAnnuity",
+    "RuerupCosts",
+    "RuerupPension",
     "Salary",
     "Spending",
 ]
