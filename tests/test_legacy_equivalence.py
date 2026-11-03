@@ -27,6 +27,10 @@ unified — three of them fix real money leaks:
   component model reduces it proportionally (average-cost). This only affects
   the after-tax columns of scenarios with negative monthly contributions
   (Sondertilgung 5%).
+- Tax on sales: legacy sold shares tax-free to cover a deficit; the component
+  model's sink pays the gain tax on what it sells. At Sondertilgung 5% the
+  reserve outruns the leftover in years 1-2, so `etf_capital` falls below
+  legacy from then on and only the loan columns are compared there.
 - etf_investment.py: legacy added the monthly contribution before applying the
   month's growth; the component model applies growth first, consistent with
   the other legacy models. The final capital differs by well under 1%.
@@ -96,12 +100,17 @@ class TestSondertilgung:
         legacy_paid = legacy[(legacy.year > 0) & (legacy.total_loan <= 0)]
         payoff = int(legacy_paid.year.iloc[0]) if not legacy_paid.empty else None
         years = [y for y in range(1, 31) if payoff is None or y < payoff]
-        assert_columns_match(
-            actual,
-            legacy,
-            ["total_loan", "etf_capital", "cumulative_interest_paid", "yearly_sondertilgung"],
-            years,
-        )
+        columns = ["total_loan", "cumulative_interest_paid", "yearly_sondertilgung"]
+        if pct < 5:
+            # nothing is ever sold at a gain, so the portfolio matches too
+            columns.append("etf_capital")
+        assert_columns_match(actual, legacy, columns, years)
+        if pct == 5:
+            # the sale tax only ever takes money out of the portfolio
+            a = actual.set_index("year")
+            b = legacy.set_index("year")
+            for year in years:
+                assert a.loc[year, "etf_capital"] < b.loc[year, "etf_capital"]
         if pct == 0:
             # no reserve -> no negative contributions -> after-tax identical too
             assert_columns_match(

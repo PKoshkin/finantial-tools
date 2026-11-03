@@ -77,12 +77,32 @@ Every component also takes a `name`, which prefixes its own result columns.
 `refinancing_years`, `sondertilgung_yearly_rate`, `compounding`), because a loan
 here always belongs to one property and is derived from its price. A rental
 flat nests two more value objects the same way: `OperatingCosts` and
-`RentalTaxation` (see below). An `Earner` may nest a `PrivateHealthInsurance`
+`RentalTaxation` (see below). An `Earner` may nest a `Retirement` (see
+below) and a `PrivateHealthInsurance`
 (`monthly_premium`, `monthly_care_premium`, `deductible_share`,
 `yearly_increase_rate`, `monthly_rebate` — a Pauschalerstattung netted against
 the debit, cash-only: payroll and assessment keep using the full contract
 figures). The payroll chain is pinned against a real 2026 DATEV payslip in
 `tests/test_real_payslips.py`.
+
+### The July settlement and the Vorauszahlungen
+
+`GermanHousehold` withholds wage tax month by month and assesses the year at
+its end; the difference, a refund or a back-payment, joins the next July's
+cash (`yearly_refund_received`). What an assessment leaves unpaid after the
+tax withheld at source the Finanzamt also asks for in advance, from its
+Bescheid on: Vorauszahlungen under §37 EStG, a quarter of that shortfall on
+10 March, June, September and December (`yearly_prepaid_tax`). None are set
+under 400 € a year, a rate in force is raised only by at least 100 € a date
+and lowered whenever the assessment says so (`quarterly_prepayment`). The
+Bescheid is taken to come with the July settlement, so March and June still
+pay the old rate and the rest of the year's new amount falls on September
+and December. A new income — a rental profit, a pension nothing is withheld
+from — is therefore paid for as next July's back-payment in its first year
+and in advance after that, and each settlement credits what was prepaid. A
+Finanzamt may also set Vorauszahlungen from an income it expects; the model
+only reads the last assessment. Neither the settlement nor the
+Vorauszahlungen are part of `monthly_amount`.
 
 Rates of return are per component: two portfolios can grow at different rates
 and be taxed differently.
@@ -115,7 +135,8 @@ Verpachtung — rent minus deductible costs, loan interest and AfA — to the
 model's `GermanHousehold` (required then; the model refuses to build without
 one). The household re-assesses its income tax with that result in the zvE, so
 a rental loss becomes a refund and a profit a back-payment, arriving with the
-July settlement of the *following* year like any other refund. The AfA base is
+July settlement of the *following* year like any other — and a profit's tax is
+asked for in advance from then on. The AfA base is
 `(price + purchase fees) * building_share`, depreciating at `afa_rate` a year.
 
 Deliberate simplifications: umlagefähige Kosten are not modelled (they cancel
@@ -125,8 +146,8 @@ calculators that book a kalkulatorischer Mietausfall on top of full rent; AfA
 runs flat forever, overstating the deduction beyond `1 / afa_rate` years;
 losses only offset income within their year (no Verlustvortrag); and the final
 year's tax settlement falls beyond the horizon and is dropped — conservative
-for a refund, but for a profitable flat it means the last year's rental tax is
-never charged.
+for a refund, but for a profitable flat it means the part of the last year's
+rental tax its Vorauszahlungen did not cover is never charged.
 
 ### Basisrente (Rürup)
 
@@ -166,12 +187,66 @@ A rise in the contribution is a second `RuerupPension` for the extra amount,
 ending in the same month, which is how the insurer books it.
 
 Deliberate simplifications: no Beitragsfreistellung, no early or late
-Rentenbeginn, no survivors' pension, no health contributions on the pension,
-deterministic returns (so no kursorientiertes Ablaufmanagement). The
-household never retires: a pension paid inside the horizon is taxed on top of
-running salaries and settled a year late. For the payout phase, use
-`taxable_income([], system, joint=..., pension_income=...)`, the zvE of a
-retired tax unit, as `notebook/ruerup_vs_etf.ipynb` does.
+Rentenbeginn, no survivors' pension, no health contributions on the pension
+(a KVdR member owes none on a Basisrente), deterministic returns (so no
+kursorientiertes Ablaufmanagement). The pension is taxed as the first
+earner's, its first year's tax as next July's back-payment and the years
+after in advance, like every pension here; give the
+household a `Retirement` to have it paid next to the statutory pension
+rather than on top of a running salary.
+
+### Retirement
+
+An `Earner` with a `Retirement` stops drawing a salary after
+`working_months` from the model start and draws a Regelaltersrente from the
+next month on, so one run covers working life and old age:
+
+```python
+Earner(
+    monthly_gross=100_000 / 12,
+    yearly_increase_rate=0.033,
+    retirement=Retirement(
+        working_months=454,                 # January 2026 – October 2063
+        monthly_pension=3_237,              # today's euros, as a Renteninformation states it
+        yearly_increase_rate=None,          # None: the TaxSystem's wage growth
+    ),
+)
+Retirement.from_entgeltpunkte(79.35, working_months=454)   # at the 40.79 € Rentenwert
+```
+
+The pension follows the Rentenwert every year from the model start, before
+and after Rentenbeginn, applied at the year boundary like every other
+escalation (the real one comes in July). It is taxed in full, which is why the
+household refuses a Rentenbeginn before 2058 — the first cohort with a
+Besteuerungsanteil of 100% (`besteuerungsanteil`); an earlier one keeps a
+Rentenfreibetrag frozen in euros, which is not modelled. Nothing is withheld:
+the first retired year's tax is a back-payment with next July's settlement,
+the years after pay theirs as Vorauszahlungen, and when a month's cash falls
+short the sink sells shares, at the gain tax those sales cost. In the year of
+retirement the salary months are
+withheld and capped month by month, the pension months follow, and one
+assessment covers both.
+
+Health and care in retirement: a statutorily insured earner joins the
+Krankenversicherung der Rentner and pays half of 14.6% plus half the
+Zusatzbeitrag, and the whole care contribution, out of the pension, up to the
+health ceiling (`retiree_contributions`); a privately insured one keeps the
+contract, and the pension fund pays half the general rate plus half the
+average Zusatzbeitrag on the pension, at most half the health premium and
+nothing toward care (`pension_subsidy`, §106 SGB VI). Both are deductible:
+the KVdR contributions in full, since a pension carries no Krankengeld; the
+private premium's basic share less that subsidy. `monthly_pension` reports
+the statutory pensions paid, `yearly_social_contributions` includes the KVdR
+contributions, and `monthly_amount` is the year's average net cash.
+
+The figures are pinned against the retirement month the NÜRNBERGER documents
+illustrate and the HanseMerkur contract (`tests/test_retirement.py`). Out of
+scope: early or deferred retirement, a pension that began before the model
+start, Hinzuverdienst, survivors' pensions, a private premium that falls at
+65, and children who grow up — `n_children` keeps its Kindergeld for the
+whole horizon. A horizon beyond 55 years needs
+`TaxSystem(rich_threshold_frozen=False)`: by then the drifting 42% border
+would pass the 45% border frozen at 277,826 €.
 
 ### One year, without a forecast
 
@@ -240,7 +315,9 @@ default). Exactly one portfolio must be the sink; give the others a fixed
 untaxed portfolio, i.e. money in an account.
 
 The sink also pays for the purchases at t=0 (down payment and fees) and covers
-deficits by selling. Its capital may go **negative** when the cash flow cannot
+deficits by selling — enough to pay the deficit and the `tax_rate` on the gain
+share of what it sells, reported as `<sink>.yearly_sale_tax`, the way a broker
+withholds the Abgeltungsteuer. Its capital may go **negative** when the cash flow cannot
 fund the plan — that is an implicit loan at the portfolio's own rate, so check
 `(df.etf_capital < 0).any()` before trusting a comparison.
 
@@ -297,7 +374,7 @@ All notebooks build the same kind of model and differ only in components:
 - `buy_as_investment_vs_etf.ipynb` — buy-to-let vs ETF-only
 - `etf_withdrawal.ipynb` — ETF accumulation with a yearly percentage withdrawal
 - `take_home_share.ipynb` — net pay as a share of total employer cost, across the German salary range
-- `ruerup_vs_etf.ipynb` — a real Basisrente contract: what it yields, the same money in an ETF, the break-even age, how much to contribute
+- `ruerup_vs_etf.ipynb` — a real Basisrente contract: what it yields, the same money in an ETF through retirement to 100, the break-even age, how much to contribute
 
 ## Tests
 
@@ -311,7 +388,10 @@ Three layers:
    the pre-component model for every notebook configuration plus four edge
    cases. The component model must reproduce them **exactly**
    (`check_exact=True`), which is what keeps floating-point reassociation from
-   silently moving the numbers.
+   silently moving the numbers. Two were re-pinned on purpose, in their
+   portfolio columns only, when the sink began to tax its deficit sales; the
+   deviation is documented in
+   [tests/test_baseline_equivalence.py](tests/test_baseline_equivalence.py).
 2. **Legacy equivalence** — before that, the repo held three separate models;
    their outputs are pinned in `tests/golden/legacy_*.csv` and still reproduced
    wherever the semantics intentionally coincide. The deliberate deviations,

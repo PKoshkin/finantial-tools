@@ -242,6 +242,7 @@ class TestColumns:
             "etf.capital_after_tax",
             "etf.yearly_withdrawal_gross",
             "etf.yearly_withdrawal_net",
+            "etf.yearly_sale_tax",
         ]
 
     def test_start_age_adds_an_age_column(self):

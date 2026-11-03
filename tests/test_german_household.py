@@ -58,6 +58,62 @@ class TestRefundTiming:
         assert df.loc[2, "etf_capital"] == pytest.approx(capital)
 
 
+STILL = TaxSystem(yearly_threshold_growth=0.0, yearly_wage_growth=0.0)  # every year alike
+
+
+def class_three_five_couple():
+    # Two similar salaries under III/V: 1,092 EUR too little withheld, every year.
+    return GermanHousehold(
+        earners=(Earner(monthly_gross=6_000.0), Earner(monthly_gross=5_000.0)),
+        tax_classes="III/V",
+        tax=STILL,
+    )
+
+
+class TestPrepaymentTiming:
+    """§37 EStG: the Bescheid that comes with July's settlement sets Vorauszahlungen."""
+
+    def test_a_refund_sets_none(self):
+        df = build(single_earner(), years=3).run()
+        assert df.loc[2, "household.yearly_refund_received"] > 0.0
+        assert (df["household.yearly_prepaid_tax"] == 0.0).all()
+
+    def test_a_back_payment_is_asked_for_in_advance(self):
+        df = build(class_three_five_couple(), years=4).run()
+        shortfall = (
+            df.loc[1, "household.yearly_assessed_tax"]
+            - df.loc[1, "household.yearly_withheld_tax"]
+        )
+        assert shortfall == 1_092.0
+        assert df.loc[1, "household.yearly_prepaid_tax"] == 0.0
+        assert df.loc[2, "household.yearly_refund_received"] == -shortfall
+        # From the second year on it is paid in advance, so the July
+        # settlement has nothing left to collect.
+        for year in (2, 3, 4):
+            assert df.loc[year, "household.yearly_prepaid_tax"] == shortfall
+        for year in (3, 4):
+            assert df.loc[year, "household.yearly_refund_received"] == 0.0
+
+    def test_the_two_dates_left_after_july_then_all_four(self):
+        rate = 0.06
+        df = build(class_three_five_couple(), years=3, etf_rate=rate).run()
+        # The Bescheid arrives after 10 March and 10 June: year 2 pays the
+        # whole amount on the two dates left, year 3 a quarter on each date.
+        prepaid = {2: {9: 546.0, 12: 546.0}, 3: {3: 273.0, 6: 273.0, 9: 273.0, 12: 273.0}}
+        monthly_rate = (1.0 + rate) ** (1.0 / 12.0) - 1.0
+        capital = 0.0
+        for year in (1, 2, 3):
+            net = df.loc[year, "household.monthly_amount"]
+            refund = df.loc[year, "household.yearly_refund_received"]
+            for month in range(1, 13):
+                contribution = net + (refund if month == 7 else 0.0)
+                contribution -= prepaid.get(year, {}).get(month, 0.0)
+                capital = capital * (1.0 + monthly_rate) + contribution
+        assert df.loc[3, "etf_capital"] == pytest.approx(capital)
+        # The reported net stays the payroll's, without the Vorauszahlungen.
+        assert df.loc[3, "household.monthly_amount"] == df.loc[1, "household.monthly_amount"]
+
+
 class TestTaxClasses:
     def test_classes_change_the_timing_but_not_the_assessed_tax(self):
         df_iii = build(single_earner(tax_classes="III/V")).run()

@@ -16,6 +16,7 @@ from src.model import (
     Mortgage,
     Rent,
     Salary,
+    SetupContext,
     Spending,
     calculate_early_repayment_penalty,
     payoff_year,
@@ -299,8 +300,9 @@ class TestEtfMath:
         )
 
     def test_selling_reduces_the_basis_proportionally(self):
-        """Spending exceeds income: the sink is sold monthly and the cost basis
-        falls by exactly the sold fraction of the portfolio."""
+        """Spending exceeds income: the sink is sold monthly, each sale grossed
+        up by the tax on the gain it realizes, and the cost basis falls by
+        exactly the sold fraction of the portfolio."""
         df = model(
             [
                 Spending(monthly_amount=1_000),
@@ -317,14 +319,52 @@ class TestEtfMath:
         g = 1.06 ** (1 / 12) - 1
         capital, basis = 100_000.0, 100_000.0
         for year in range(1, 6):
+            tax = 0.0
             for _ in range(12):
                 before_sale = capital * (1 + g)
-                capital = before_sale - 1_000
-                basis *= 1.0 - min(1_000 / before_sale, 1.0)
+                gain_share = max(0.0, 1.0 - basis / before_sale)
+                sold = 1_000 / (1.0 - gain_share * 0.25)
+                tax += sold - 1_000
+                capital = before_sale - sold
+                basis *= 1.0 - min(sold / before_sale, 1.0)
             assert df.loc[year, "etf_capital"] == pytest.approx(capital, rel=1e-12)
             assert df.loc[year, "etf_cost_basis"] == pytest.approx(basis, rel=1e-12)
+            assert df.loc[year, "etf.yearly_sale_tax"] == pytest.approx(tax, rel=1e-9)
         assert (df.etf_cost_basis >= 0).all()
         assert (df.etf_cost_basis <= df.etf_capital + 1e-6).all()
+
+    @staticmethod
+    def _sell(sink: Etf, basis: float, deficit: float):
+        """One zero-return month of `sink` holding `basis`, covering `deficit`."""
+        state = sink.open(SetupContext(model([sink], years=1)._params))
+        state.cost_basis = basis
+        sink.absorb(state, None, -deficit)
+        return state
+
+    def test_a_deficit_sale_pays_the_tax_on_its_gain(self):
+        """By hand: a 10% gain share at 25% tax nets 97.5 cents per euro sold."""
+        state = self._sell(Etf(initial_capital=100_000, tax_rate=25 / 100), 90_000.0, 975.0)
+        assert state.capital == pytest.approx(100_000.0 - 1_000.0)
+        assert state.cost_basis == pytest.approx(90_000.0 * (1.0 - 1_000.0 / 100_000.0))
+        assert state.year_sale_tax == pytest.approx(25.0)
+
+    def test_selling_more_than_everything_taxes_everything_and_borrows_the_rest(self):
+        state = self._sell(Etf(initial_capital=1_000, tax_rate=25 / 100), 600.0, 2_000.0)
+        # The whole 1,000 is sold, 400 of it gain taxed at 100; the missing
+        # 1,100 is the implicit loan, and a negative portfolio has no basis.
+        assert state.year_sale_tax == pytest.approx(100.0)
+        assert state.capital == pytest.approx(1_000.0 - 100.0 - 2_000.0)
+        assert state.cost_basis == 0.0
+
+    @pytest.mark.parametrize(
+        "sink, basis",
+        [(Etf(initial_capital=1_000), 500.0), (Etf(initial_capital=1_000, tax_rate=25 / 100), 1_200.0)],
+        ids=["untaxed", "at_a_loss"],
+    )
+    def test_without_a_taxable_gain_a_sale_is_at_face_value(self, sink, basis):
+        state = self._sell(sink, basis, 100.0)
+        assert state.capital == 900.0
+        assert state.year_sale_tax == 0.0
 
     def test_withdrawal_updates_the_basis_across_years(self):
         df = model(

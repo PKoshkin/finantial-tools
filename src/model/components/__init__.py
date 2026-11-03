@@ -1,7 +1,7 @@
 """The component implementations."""
 
 from .etf import REMAINDER, Etf
-from .household import Earner, GermanHousehold, PrivateHealthInsurance
+from .household import Earner, GermanHousehold, PrivateHealthInsurance, Retirement
 from .income import Salary
 from .property import Home, InvestmentProperty, Mortgage, OperatingCosts, RentalTaxation
 from .ruerup import RuerupAnnuity, RuerupCosts, RuerupPension
@@ -19,6 +19,7 @@ __all__ = [
     "PrivateHealthInsurance",
     "Rent",
     "RentalTaxation",
+    "Retirement",
     "RuerupAnnuity",
     "RuerupCosts",
     "RuerupPension",

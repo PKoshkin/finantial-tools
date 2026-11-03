@@ -122,8 +122,9 @@ class RentalTaxation:
     Setting this on an `InvestmentProperty` makes it publish its yearly
     Einkünfte aus Vermietung und Verpachtung — rent minus deductible costs,
     loan interest and AfA — to the model's `GermanHousehold`, whose assessed
-    tax then moves accordingly (the cash arrives with the July refund of the
-    following year). The AfA base is `(price + purchase fees) * building_share`
+    tax then moves accordingly (the cash arrives with the July settlement of
+    the following year, and a profit's tax is then also asked for in
+    advance). The AfA base is `(price + purchase fees) * building_share`
     and depreciates at `afa_rate` a year (§7 EStG: 2% for existing buildings,
     3% for new ones), flat forever — the model does not stop depreciating
     once the building is written off, which overstates the deduction beyond

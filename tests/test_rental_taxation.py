@@ -513,11 +513,36 @@ def test_taxation_composes_with_sondertilgung_and_refinancing():
     )
 
 
+def test_a_profit_is_asked_for_in_advance(pir, kl):
+    # Pirmasens's profit leaves a back-payment every year, so the Finanzamt
+    # sets Vorauszahlungen from year 2 on. It raises them only once the raise
+    # reaches 100 EUR a date (§37 Abs. 5 S. 2 EStG): years 3 and 4 keep year
+    # 2's rate though the back-payment grows, year 5 catches up.
+    shortfall = pir["household.yearly_assessed_tax"] - pir["household.yearly_withheld_tax"]
+    prepaid = pir["household.yearly_prepaid_tax"]
+    assert prepaid[1] == 0.0
+    assert prepaid[2] == pytest.approx(shortfall[1])
+    for year in (3, 4):
+        assert shortfall[year - 1] / 4.0 - shortfall[1] / 4.0 < 100.0
+        assert prepaid[year] == pytest.approx(shortfall[1])
+    assert shortfall[4] / 4.0 - shortfall[1] / 4.0 >= 100.0
+    assert prepaid[5] == pytest.approx(shortfall[4])
+    # Each July settlement credits what was paid in advance.
+    for year in range(2, 12):
+        assert pir.loc[year + 1, "household.yearly_refund_received"] == pytest.approx(
+            prepaid[year] - shortfall[year]
+        )
+    # KL's loss brings refunds, which set none — until its result turns.
+    assert (kl.loc[:9, "household.yearly_prepaid_tax"] == 0.0).all()
+    assert kl.loc[10, "household.yearly_prepaid_tax"] > 0.0
+
+
 def test_final_year_settlement_is_dropped_beyond_the_horizon(pir, alone):
     # The last simulated year's assessment never becomes cash: its July
     # settlement lies beyond the horizon. For this profitable flat that is a
-    # dropped back-payment, i.e. the final wealth is *overstated* by roughly
-    # one year's rental tax — the inverse of the conservative wage-refund cut.
+    # dropped back-payment — the part of the year's rental tax that its
+    # Vorauszahlungen did not cover — so the final wealth is *overstated* by
+    # it, the inverse of the conservative wage-refund cut.
     short = run(pirmasens(), years=2)
     operative = -18_666.0
     for year in (1, 2):
@@ -526,10 +551,13 @@ def test_final_year_settlement_is_dropped_beyond_the_horizon(pir, alone):
             - short.loc[year, "flat.monthly_operating_costs"]
             - 900.0
         )
+    # Year 1's back-payment set Vorauszahlungen, paid on two dates of year 2.
+    prepaid = short.loc[2, "household.yearly_prepaid_tax"] - alone.loc[2, "household.yearly_prepaid_tax"]
+    assert prepaid > 0.0
     diff = short.loc[2, "etf_capital"] - alone.loc[2, "etf_capital"]
-    assert diff == pytest.approx(operative + tax_delta(short, alone, 1), abs=0.01)
-    # The dropped year-2 settlement is material, so the omission matters.
-    assert abs(tax_delta(short, alone, 2)) > 100.0
+    assert diff == pytest.approx(operative + tax_delta(short, alone, 1) - prepaid, abs=0.01)
+    # The dropped year-2 settlement is still material, so the omission matters.
+    assert abs(tax_delta(short, alone, 2) + prepaid) > 100.0
 
 
 # --- validation -------------------------------------------------------------
