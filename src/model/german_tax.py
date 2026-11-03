@@ -13,13 +13,20 @@ statute says.
 
 Scope cuts, all deliberate: no Kirchensteuer, no Steuerklasse II
 (single-parent relief), no Sachsen Pflegeversicherung split, Krankengeld
-entitlement assumed (the full 14.6% health rate, and the matching 4% haircut
-on the deduction), every adult is 23 or older (so the childless care
-surcharge always applies to a household without children), and the private
-insurance eligibility threshold (JAEG) is not checked. Unemployment insurance
-is never deducted at assessment: the 1,900 EUR cap for "sonstige
-Vorsorgeaufwendungen" is already exhausted by any full-time health
+entitlement assumed while employed (the full 14.6% health rate, and the
+matching 4% haircut on the deduction), every adult is 23 or older (so the
+childless care surcharge always applies to a household without children), and
+the private insurance eligibility threshold (JAEG) is not checked.
+Unemployment insurance is never deducted at assessment: the 1,900 EUR cap for
+"sonstige Vorsorgeaufwendungen" is already exhausted by any full-time health
 contribution, so the deduction would be zero anyway.
+
+Retirement has its own three rules here: what a member of the
+Krankenversicherung der Rentner pays out of a statutory pension
+(`retiree_contributions`), what the pension fund pays toward a private premium
+instead (`pension_subsidy`), and how much of a pension is taxable
+(`besteuerungsanteil`). A pension owes no Krankengeld haircut: nothing it
+pays for can turn into Krankengeld.
 """
 
 from __future__ import annotations
@@ -27,6 +34,9 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 from typing import Sequence
+
+BASE_YEAR = 2026  # the year TaxSystem's defaults are enacted for: model year 1
+RENTENWERT = 40.79  # aktueller Rentenwert from 1 July 2025, in force at the model start
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,11 +122,22 @@ class TaxSystem:
         compound the drift twice. Drifted borders are deliberately not
         re-rounded to full euros: the statutory flooring of income and tax is
         what carries the integer character, not the borders themselves.
+
+        With the 45% border frozen, the 42% border drifts past it 56 years
+        on and the tariff stops being one; that raises, and a horizon that
+        long — a whole life, retirement included — needs
+        `rich_threshold_frozen=False`.
         """
         if years_from_base == 0:
             return self
         t = (1.0 + self.yearly_threshold_growth) ** years_from_base
         w = (1.0 + self.yearly_wage_growth) ** years_from_base
+        if self.rich_threshold_frozen and self.zone3_end * t >= self.rich_threshold:
+            raise ValueError(
+                f"{years_from_base} years on, the drifting 42% border passes the 45% one "
+                f"frozen at {self.rich_threshold:,.0f}; a horizon this long needs "
+                "TaxSystem(rich_threshold_frozen=False)"
+            )
         return replace(
             self,
             basic_allowance=self.basic_allowance * t,
@@ -331,6 +352,8 @@ def private_deductible(
     monthly_care_premium: float,
     deductible_share: float,
     system: TaxSystem,
+    *,
+    subsidy: float | None = None,
 ) -> float:
     """The yearly deductible part of a private premium (§10 Abs. 1 Nr. 3).
 
@@ -338,12 +361,76 @@ def private_deductible(
     counts, the care premium counts in full, and the employer subsidy is
     offset against the favored part in full — the comfort remainder yields
     nothing because the 1,900 EUR cap is already exhausted.
+
+    `subsidy` is the tax-free monthly subsidy to offset, when it is not the
+    employer's: in retirement the pension fund's `pension_subsidy`.
     """
-    subsidy = private_subsidy(monthly_premium, monthly_care_premium, system)
+    if subsidy is None:
+        subsidy = private_subsidy(monthly_premium, monthly_care_premium, system)
     deductible = (
         deductible_share * monthly_premium + monthly_care_premium - subsidy
     ) * 12.0
     return max(deductible, 0.0)
+
+
+def retiree_contributions(
+    monthly_pension: float, system: TaxSystem, *, n_children: int
+) -> SocialContributions:
+    """What a KVdR member pays out of a statutory pension, monthly.
+
+    The pension fund carries the other half of the health contribution, so
+    the retiree pays half the general rate plus half the Zusatzbeitrag — the
+    general rate, as there is no Krankengeld to price out. The care
+    contribution falls on the retiree alone: both halves plus any childless
+    surcharge (`pv_rate / 2` on top of the employee rate). Both are capped at
+    the health ceiling; a pension owes no pension or unemployment
+    contribution. A Basisrente is no part of the base: private pensions are
+    contribution-free in the KVdR.
+    """
+    base = min(monthly_pension, system.bbg_health / 12.0)
+    return SocialContributions(
+        pension=0.0,
+        unemployment=0.0,
+        health=base * ((system.kv_base_rate + system.kv_extra_rate) / 2.0),
+        care=base * (system.pv_rate / 2.0 + _employee_care_rate(system, n_children)),
+    )
+
+
+def pension_subsidy(monthly_pension: float, monthly_premium: float, system: TaxSystem) -> float:
+    """The pension fund's monthly subsidy to a private health premium (§106 SGB VI).
+
+    Half the general rate plus half the average Zusatzbeitrag, applied to the
+    Zahlbetrag of the pension — what the fund would carry in the KVdR — and
+    capped at half the health premium. Unlike the employer's subsidy it has
+    no contribution ceiling and nothing for the care premium. Tax-free, so
+    it is offset against the deductible premium.
+    """
+    return min(
+        monthly_pension * ((system.kv_base_rate + system.kv_extra_rate) / 2.0),
+        0.5 * monthly_premium,
+    )
+
+
+def besteuerungsanteil(start_year: int) -> float:
+    """The taxable share of a pension starting in `start_year` (§22 Nr. 1 S. 3 a aa).
+
+    The cohort rule as the Wachstumschancengesetz left it: 50% for every
+    start up to 2005, then two points more per cohort to 80% in 2020, one
+    point to 82% in 2022, and half a point from 2023 (82.5%) — 84% for a 2026
+    start, 100% from 2058. Below 100% the share fixes a Rentenfreibetrag in
+    euros, from the first full year's pension and for life, so every later
+    Rentenanpassung is taxed in full; this model only takes pensions taxed
+    in full from the first euro.
+    """
+    if start_year <= 2005:
+        per_mille = 500
+    elif start_year <= 2020:
+        per_mille = 500 + 20 * (start_year - 2005)
+    elif start_year <= 2022:
+        per_mille = 800 + 10 * (start_year - 2020)
+    else:
+        per_mille = min(825 + 5 * (start_year - 2023), 1_000)
+    return per_mille / 1_000.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -352,11 +439,21 @@ class EarnerFigures:
 
     `private_deductible` is 0.0 for a statutorily insured earner — their
     health and care deduction comes from `social` instead.
+
+    A year in retirement adds `pension`, the gross statutory pension paid,
+    and, in the KVdR, the `retiree_health` and `retiree_care` contributions
+    paid out of it; a privately insured retiree's premium stays in
+    `private_deductible`. A year in which the earner retires carries both
+    halves: the salary months in `yearly_gross` and `social`, the pension
+    months here.
     """
 
     yearly_gross: float
     social: SocialContributions
     private_deductible: float = 0.0
+    pension: float = 0.0
+    retiree_health: float = 0.0
+    retiree_care: float = 0.0
 
 
 def basisrente_cap(system: TaxSystem, *, joint: bool) -> float:
@@ -425,6 +522,11 @@ def taxable_income(
     pensions belong to one spouse. With no earners at all this is the zvE of
     a retired tax unit.
 
+    An earner's own `pension` — the statutory pension, taxed in full, which
+    `GermanHousehold` only allows from a 2058 start — takes that earner's
+    own allowance. Their KVdR contributions are deducted in full: no 4%
+    haircut, since a pension carries no Krankengeld.
+
     `basisrente_contributions` are deducted as far as `basisrente_deduction`
     lets them through the §10 Abs. 3 cap.
 
@@ -442,14 +544,21 @@ def taxable_income(
     if pension_income > 0.0:
         zve += max(pension_income - system.pension_allowance, 0.0)
     for earner in earners:
+        if earner.pension > 0.0:
+            zve += max(earner.pension - system.pension_allowance, 0.0)
+    for earner in earners:
         zve -= earner.social.pension
         zve -= earner.social.health * (1.0 - system.krankengeld_reduction)
         zve -= earner.social.care
         zve -= earner.private_deductible
+        zve -= earner.retiree_health
+        zve -= earner.retiree_care
         basis = (
             earner.social.health * (1.0 - system.krankengeld_reduction)
             + earner.social.care
             + earner.private_deductible
+            + earner.retiree_health
+            + earner.retiree_care
         )
         room = system.other_vorsorge_cap - basis
         if room > 0.0:

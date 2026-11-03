@@ -58,7 +58,9 @@ Model semantics — the details that decide what the numbers mean:
 - Portfolio taxation: capital gains tax on `capital - cost basis`, reported in
   the `*_after_tax` columns; the gross capital keeps compounding untaxed until
   sale. Selling reduces the cost basis proportionally to the sold share of the
-  portfolio (average-cost method).
+  portfolio (average-cost method). When the sink sells to cover a deficit it
+  pays that tax on the spot: it sells enough to cover the deficit and the tax
+  on the gain share of what it sold (`yearly_sale_tax`).
 - A yearly withdrawal is taken at year end, after the Sondertilgung, taxed on
   its gain part, and considered consumed rather than reinvested.
 - Spending grows monthly with inflation; salaries, rent, rental income and a
@@ -78,6 +80,15 @@ Model semantics — the details that decide what the numbers mean:
   the contributions within the §10 Abs. 3 cap at assessment, so the saving
   arrives with the next July refund; from Rentenbeginn the pension is paid
   in its own `PENSION` cash phase and taxed in full the same way.
+- Retirement: an `Earner` with a `Retirement` draws its salary for
+  `working_months` and a Regelaltersrente from the next month, given in
+  today's euros and raised with the Rentenwert every year. Only a
+  Rentenbeginn from 2058, taxed in full, is accepted. Nothing is withheld
+  from a pension, so its tax is a back-payment with the next July
+  settlement, paid by the sink like any deficit. In retirement the KVdR
+  share comes out of a statutory earner's pension, while a private contract
+  continues with the pension fund's subsidy (half the premium at most);
+  both are deducted at assessment.
 - Insurance deductions: the unemployment contribution counts toward payroll
   and assessment only as far as it fits the 1,900 € bucket (§10 Abs. 4) next
   to the health-and-care deduction — irrelevant on a statutory wage, decisive
@@ -122,6 +133,7 @@ from .components import (
     PrivateHealthInsurance,
     Rent,
     RentalTaxation,
+    Retirement,
     RuerupAnnuity,
     RuerupCosts,
     RuerupPension,
@@ -159,6 +171,7 @@ __all__ = [
     "PrivateHealthInsurance",
     "Rent",
     "RentalTaxation",
+    "Retirement",
     "RuerupAnnuity",
     "RuerupCosts",
     "RuerupPension",

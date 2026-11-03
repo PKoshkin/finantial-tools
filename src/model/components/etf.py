@@ -51,6 +51,7 @@ class EtfState:
     monthly_rate: float
     withdrawal_gross: float = 0.0
     withdrawal_net: float = 0.0
+    year_sale_tax: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -59,9 +60,12 @@ class Etf(FinancialComponent):
 
     `monthly_investment=REMAINDER` (the default) makes this the model's cash
     sink: every month's surplus flows in and every deficit is covered by
-    selling. Exactly one portfolio must be the sink. The capital may go
-    negative when the cash flow cannot fund the plan — that deficit keeps
-    compounding at the portfolio's rate, i.e. an implicit loan.
+    selling. A sale realizes the gain share of what it sells, and the sink
+    sells enough to pay the deficit *and* the `tax_rate` on that gain, the way
+    a broker withholds the Abgeltungsteuer at sale (`yearly_sale_tax`).
+    Exactly one portfolio must be the sink. The capital may go negative when
+    the cash flow cannot fund the plan — that deficit keeps compounding at the
+    portfolio's rate, i.e. an implicit loan, and borrowing realizes nothing.
 
     Give `monthly_investment` a number instead to contribute a fixed amount;
     such a portfolio is funded out of the leftover before the sink sees it.
@@ -131,13 +135,40 @@ class Etf(FinancialComponent):
     def absorb(self, state: EtfState, ctx: MonthContext, amount: float) -> None:
         # Growth first, then the contribution: a euro paid in this month does
         # not earn this month's return.
-        state.capital = state.capital * (1.0 + state.monthly_rate) + amount
+        grown = state.capital * (1.0 + state.monthly_rate)
+        if amount < 0 and self.tax_rate > 0.0 and grown > 0.0 and grown > state.cost_basis:
+            self._sell_taxed(state, grown, -amount)
+            return
+        state.capital = grown + amount
         if amount >= 0:
             state.cost_basis += amount
         else:
             state.cost_basis = sell(state.capital + (-amount), state.cost_basis, -amount)
 
+    def _sell_taxed(self, state: EtfState, grown: float, needed: float) -> None:
+        """Cover `needed` in cash by selling at a gain, the tax included.
+
+        Every euro sold carries the same gain share (average cost), so it
+        nets `1 - gain_share * tax_rate` and the sale is grossed up by that.
+        When even selling everything cannot pay, everything is sold and
+        taxed, and what is still missing becomes the implicit loan.
+        """
+        tax_per_euro = (1.0 - state.cost_basis / grown) * self.tax_rate
+        gross = needed / (1.0 - tax_per_euro)
+        if gross <= grown:
+            state.capital = grown - gross
+            state.cost_basis = sell(grown, state.cost_basis, gross)
+            state.year_sale_tax += gross - needed
+        else:
+            tax = (grown - state.cost_basis) * self.tax_rate
+            state.capital = grown - tax - needed
+            state.cost_basis = 0.0
+            state.year_sale_tax += tax
+
     # --- year end ---
+    def year_begin(self, state: EtfState, ctx: YearContext) -> None:
+        state.year_sale_tax = 0.0
+
     def credit_untaxed(self, state: EtfState, amount: float) -> None:
         state.capital += amount
         state.cost_basis += amount
@@ -165,6 +196,7 @@ class Etf(FinancialComponent):
             "capital_after_tax": self._after_tax(state),
             "yearly_withdrawal_gross": state.withdrawal_gross,
             "yearly_withdrawal_net": state.withdrawal_net,
+            "yearly_sale_tax": state.year_sale_tax,
         }
 
     def report_initial(self, state: EtfState) -> dict[str, float]:
@@ -174,4 +206,5 @@ class Etf(FinancialComponent):
             "capital_after_tax": self._after_tax(state),
             "yearly_withdrawal_gross": 0.0,
             "yearly_withdrawal_net": 0.0,
+            "yearly_sale_tax": 0.0,
         }
