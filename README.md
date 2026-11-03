@@ -85,6 +85,25 @@ the debit, cash-only: payroll and assessment keep using the full contract
 figures). The payroll chain is pinned against a real 2026 DATEV payslip in
 `tests/test_real_payslips.py`.
 
+### The July settlement and the Vorauszahlungen
+
+`GermanHousehold` withholds wage tax month by month and assesses the year at
+its end; the difference, a refund or a back-payment, joins the next July's
+cash (`yearly_refund_received`). What an assessment leaves unpaid after the
+tax withheld at source the Finanzamt also asks for in advance, from its
+Bescheid on: Vorauszahlungen under §37 EStG, a quarter of that shortfall on
+10 March, June, September and December (`yearly_prepaid_tax`). None are set
+under 400 € a year, a rate in force is raised only by at least 100 € a date
+and lowered whenever the assessment says so (`quarterly_prepayment`). The
+Bescheid is taken to come with the July settlement, so March and June still
+pay the old rate and the rest of the year's new amount falls on September
+and December. A new income — a rental profit, a pension nothing is withheld
+from — is therefore paid for as next July's back-payment in its first year
+and in advance after that, and each settlement credits what was prepaid. A
+Finanzamt may also set Vorauszahlungen from an income it expects; the model
+only reads the last assessment. Neither the settlement nor the
+Vorauszahlungen are part of `monthly_amount`.
+
 Rates of return are per component: two portfolios can grow at different rates
 and be taxed differently.
 
@@ -116,7 +135,8 @@ Verpachtung — rent minus deductible costs, loan interest and AfA — to the
 model's `GermanHousehold` (required then; the model refuses to build without
 one). The household re-assesses its income tax with that result in the zvE, so
 a rental loss becomes a refund and a profit a back-payment, arriving with the
-July settlement of the *following* year like any other refund. The AfA base is
+July settlement of the *following* year like any other — and a profit's tax is
+asked for in advance from then on. The AfA base is
 `(price + purchase fees) * building_share`, depreciating at `afa_rate` a year.
 
 Deliberate simplifications: umlagefähige Kosten are not modelled (they cancel
@@ -126,8 +146,8 @@ calculators that book a kalkulatorischer Mietausfall on top of full rent; AfA
 runs flat forever, overstating the deduction beyond `1 / afa_rate` years;
 losses only offset income within their year (no Verlustvortrag); and the final
 year's tax settlement falls beyond the horizon and is dropped — conservative
-for a refund, but for a profitable flat it means the last year's rental tax is
-never charged.
+for a refund, but for a profitable flat it means the part of the last year's
+rental tax its Vorauszahlungen did not cover is never charged.
 
 ### Basisrente (Rürup)
 
@@ -170,7 +190,8 @@ Deliberate simplifications: no Beitragsfreistellung, no early or late
 Rentenbeginn, no survivors' pension, no health contributions on the pension
 (a KVdR member owes none on a Basisrente), deterministic returns (so no
 kursorientiertes Ablaufmanagement). The pension is taxed as the first
-earner's and settled a year late, like every pension here; give the
+earner's, its first year's tax as next July's back-payment and the years
+after in advance, like every pension here; give the
 household a `Retirement` to have it paid next to the statutory pension
 rather than on top of a running salary.
 
@@ -198,10 +219,11 @@ and after Rentenbeginn, applied at the year boundary like every other
 escalation (the real one comes in July). It is taxed in full, which is why the
 household refuses a Rentenbeginn before 2058 — the first cohort with a
 Besteuerungsanteil of 100% (`besteuerungsanteil`); an earlier one keeps a
-Rentenfreibetrag frozen in euros, which is not modelled. Nothing is withheld,
-so a retired year's tax is a back-payment with next July's settlement, and
-the sink pays it by selling shares, at the gain tax those sales cost (there
-are no Vorauszahlungen). In the year of retirement the salary months are
+Rentenfreibetrag frozen in euros, which is not modelled. Nothing is withheld:
+the first retired year's tax is a back-payment with next July's settlement,
+the years after pay theirs as Vorauszahlungen, and when a month's cash falls
+short the sink sells shares, at the gain tax those sales cost. In the year of
+retirement the salary months are
 withheld and capped month by month, the pension months follow, and one
 assessment covers both.
 

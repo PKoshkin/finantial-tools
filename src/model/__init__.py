@@ -70,7 +70,8 @@ Model semantics — the details that decide what the numbers mean:
   Einkünfte aus Vermietung und Verpachtung (rent − deductible operating costs
   − loan interest − AfA on `(price + fees) * building_share`) to the
   `GermanHousehold`, which re-assesses the year's income tax with it — the
-  cash effect rides the July refund of the following year. Losses offset wage
+  cash effect rides the July settlement of the following year, and a
+  profit's tax is asked for in advance from then on. Losses offset wage
   income within their year only (no Verlustvortrag).
 - Basisrente: a `RuerupPension` takes its contribution out of the leftover
   like a fixed `Etf` contribution (so `monthly_invested` counts it), but its
@@ -84,11 +85,18 @@ Model semantics — the details that decide what the numbers mean:
   `working_months` and a Regelaltersrente from the next month, given in
   today's euros and raised with the Rentenwert every year. Only a
   Rentenbeginn from 2058, taxed in full, is accepted. Nothing is withheld
-  from a pension, so its tax is a back-payment with the next July
-  settlement, paid by the sink like any deficit. In retirement the KVdR
-  share comes out of a statutory earner's pension, while a private contract
-  continues with the pension fund's subsidy (half the premium at most);
-  both are deducted at assessment.
+  from a pension: the first retired year's tax is a back-payment with the
+  next July settlement, the years after pay theirs in advance. In retirement
+  the KVdR share comes out of a statutory earner's pension, while a private
+  contract continues with the pension fund's subsidy (half the premium at
+  most); both are deducted at assessment.
+- Vorauszahlungen (§37 EStG): what an assessment leaves unpaid after the tax
+  withheld at source is also asked for in advance, a quarter on each of 10
+  March, June, September and December (`yearly_prepaid_tax`), none under
+  400 € a year and a raise only by 100 € a date. The Bescheid comes with the
+  July settlement, so the year's first two dates pay the rate in force
+  before it and the last two the rest of the new amount; the next settlement
+  credits what was paid.
 - Insurance deductions: the unemployment contribution counts toward payroll
   and assessment only as far as it fits the 1,900 € bucket (§10 Abs. 4) next
   to the health-and-care deduction — irrelevant on a statutory wage, decisive

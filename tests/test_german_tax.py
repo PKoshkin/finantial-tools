@@ -22,6 +22,7 @@ from src.model.german_tax import (
     income_tax,
     private_deductible,
     private_subsidy,
+    quarterly_prepayment,
     social_contributions,
     solidarity_surcharge,
     splitting_tax,
@@ -496,3 +497,30 @@ class TestEmployeeYear:
         assert rebated.assessed.total == plain.assessed.total
         assert rebated.withheld.total == plain.withheld.total
         assert rebated.net - plain.net == pytest.approx(12 * 182.95)
+
+
+class TestVorauszahlungen:
+    """§37 EStG as gesetze-im-internet.de states it: four dates a year, set
+    from the last assessment, none under 400 EUR a year (Abs. 5 S. 1), no
+    raise under 100 EUR a date (Abs. 5 S. 2)."""
+
+    def test_a_quarter_of_what_the_assessment_left_unpaid(self):
+        assert quarterly_prepayment(8_364.0, SYSTEM) == 2_091.0
+
+    def test_nothing_under_400_euros_a_year(self):
+        assert quarterly_prepayment(-3_175.55, SYSTEM) == 0.0  # a refund
+        assert quarterly_prepayment(399.99, SYSTEM) == 0.0
+        assert quarterly_prepayment(400.0, SYSTEM) == 100.0
+
+    def test_a_rate_in_force_rises_by_100_euros_a_date_or_not_at_all(self):
+        assert quarterly_prepayment(1_196.0, SYSTEM, in_force=200.0) == 200.0
+        assert quarterly_prepayment(1_200.0, SYSTEM, in_force=200.0) == 300.0
+
+    def test_a_lower_assessment_lowers_it_by_any_amount(self):
+        assert quarterly_prepayment(1_196.0, SYSTEM, in_force=300.0) == 299.0
+        assert quarterly_prepayment(399.0, SYSTEM, in_force=300.0) == 0.0
+
+    def test_the_minimums_do_not_drift(self):
+        later = TaxSystem(rich_threshold_frozen=False).for_year(40)
+        assert later.prepayment_minimum == 400.0
+        assert later.prepayment_raise_minimum == 100.0

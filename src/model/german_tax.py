@@ -27,6 +27,10 @@ Krankenversicherung der Rentner pays out of a statutory pension
 instead (`pension_subsidy`), and how much of a pension is taxable
 (`besteuerungsanteil`). A pension owes no Krankengeld haircut: nothing it
 pays for can turn into Krankengeld.
+
+What an assessment leaves unpaid after the tax withheld at source — always
+the case for a pension, which nothing is withheld from — the Finanzamt asks
+for in advance the next year: `quarterly_prepayment` is the §37 EStG rule.
 """
 
 from __future__ import annotations
@@ -97,6 +101,10 @@ class TaxSystem:
     # --- children ----------------------------------------------------------
     child_benefit_monthly: float = 259.0  # Kindergeld, per child
     child_allowance: float = 9_756.0  # Kinder- plus BEA-Freibetrag, per child
+
+    # --- Vorauszahlungen (§37 Abs. 5 EStG); fixed by law, do not drift -------
+    prepayment_minimum: float = 400.0  # a year's Vorauszahlungen, or none are set
+    prepayment_raise_minimum: float = 100.0  # a raise per date, or the rate stands
 
     # --- Steuerklasse V withholding tiers (§39b Abs. 2 Satz 7) -------------
     class5_thresholds: tuple[float, float, float] = (14_071.0, 34_939.0, 222_260.0)
@@ -606,6 +614,25 @@ def assessed_tax(
         income_tax=tax,
         solidarity=solidarity_surcharge(reduced, system, joint=joint),
     )
+
+
+def quarterly_prepayment(shortfall: float, system: TaxSystem, *, in_force: float = 0.0) -> float:
+    """The Vorauszahlung per date that a Bescheid sets (§37 EStG).
+
+    Paid on four dates a year — 10 March, June, September and December — and
+    measured on the last assessment: the tax it set less what was withheld at
+    source (§37 Abs. 3 S. 2), `shortfall`, income tax and Soli together, as
+    the Soli is levied on the Vorauszahlungen too. A refund sets none, nor
+    does a shortfall under 400 EUR a year (Abs. 5 S. 1). A rate already
+    `in_force` is raised only by at least 100 EUR a date (S. 2), and lowered
+    whenever the assessment says so.
+    """
+    if shortfall < system.prepayment_minimum:
+        return 0.0
+    quarterly = shortfall / 4.0
+    if in_force < quarterly < in_force + system.prepayment_raise_minimum:
+        return in_force
+    return quarterly
 
 
 def _vorsorgepauschale(

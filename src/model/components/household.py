@@ -6,16 +6,32 @@ assessment rules of `german_tax`: social contributions, wage-tax withholding
 under a Steuerklasse choice, private or statutory health insurance, and the
 joint yearly assessment whose over-withholding comes back as a refund.
 
-The refund for a year is paid out on July 1 of the *following* year and
-simply joins that month's income — the engine sweeps it into the sink like
-any other leftover cash, so it starts compounding mid-year. Two
-consequences: the very first simulated year contains no refund (there is no
-prior year), and the final year's settlement arrives beyond the horizon and
-is dropped. For wage over-withholding that cut is conservative — money owed
-to the household disappears. With a taxed rental *profit* the dropped
-settlement is a back-payment, so the last year's rental tax is never
-charged and the final wealth is overstated by about one year's rental tax;
-keep that in mind when comparing short horizons.
+The settlement for a year — a refund, or a back-payment when negative — is
+paid out on July 1 of the *following* year and simply joins that month's
+income: the engine sweeps it into the sink like any other leftover cash, so
+a refund starts compounding mid-year. Two consequences: the very first
+simulated year contains no settlement (there is no prior year), and the
+final year's settlement arrives beyond the horizon and is dropped. For wage
+over-withholding that cut is conservative — money owed to the household
+disappears. A dropped back-payment, from a rental profit or a pension,
+overstates the final wealth instead, by what of the last year's tax the
+Vorauszahlungen did not cover; keep that in mind when comparing short
+horizons.
+
+What an assessment leaves unpaid after the tax withheld at source, the
+Finanzamt also asks for in advance from its Bescheid on: the
+Vorauszahlungen of §37 EStG, a quarter of that shortfall on each of 10
+March, June, September and December, within the statutory minimums of
+`quarterly_prepayment`. The Bescheid comes with the July settlement, so 10
+March and 10 June still pay the rate in force before it; the rest of the
+year's new amount falls on 10 September and 10 December, and the years
+after pay the new rate on all four dates. The next settlement credits what
+was paid. So the Vorauszahlungen trail an income by a year: the year it
+first appears its tax is next July's back-payment, and after that only its
+growth is. They are reported as `yearly_prepaid_tax` and, like the
+settlement, left out of `monthly_amount`. A Finanzamt may also set them
+from an income it expects (§37 Abs. 3 S. 3); this one only reads the last
+assessment.
 
 The Steuerklasse combination never changes the assessed yearly tax, only how
 much cash arrives monthly versus as the July refund. "III/V" gives the first
@@ -26,8 +42,9 @@ Rental components with a `RentalTaxation` publish their yearly Einkünfte aus
 Vermietung und Verpachtung, and this household picks them up in `year_assess`:
 the year's assessed tax is recomputed with the rental result in the zvE, so
 the effect — a refund for a rental loss, a back-payment for a profit — rides
-the same July channel as the wage over-withholding. Losses only offset income
-within their year; whatever pushes the zvE below zero is forfeited (no
+the same July channel as the wage over-withholding, and a profit's tax is
+then asked for in advance like any other. Losses only offset income within
+their year; whatever pushes the zvE below zero is forfeited (no
 Verlustvortrag).
 
 A `RuerupPension` publishes two things the same way. Its contributions are
@@ -36,8 +53,8 @@ Basisrente is not part of the payroll Vorsorgepauschale and cannot be put
 on the ELStAM as a Freibetrag — so the tax they save arrives as next July's
 refund, exactly as it does in real life. Its pension joins the zvE as
 taxable Leibrente; nothing is withheld at source, so the tax on it is
-settled through the same channel, a year late (the model has no
-Vorauszahlungen).
+settled through the same channel, a year late, and asked for in advance
+from then on.
 
 An `Earner` may retire, so that one run covers working life and old age:
 after `Retirement.working_months` the salary stops and a Regelaltersrente
@@ -46,10 +63,11 @@ the Rentenwert every year from the model start, before Rentenbeginn as after
 it. It is taxed in full, which is why the household only takes a
 Rentenbeginn from 2058 on, when the Besteuerungsanteil reaches 100%: an
 earlier cohort keeps a Rentenfreibetrag frozen in euros, which is not
-modelled. Nothing is withheld from a pension, so a retired year's tax is a
-back-payment with next July's settlement. A statutorily insured earner joins
-the Krankenversicherung der Rentner: half the health contribution and the
-whole care contribution come out of the pension and are deducted in full. A
+modelled. Nothing is withheld from a pension: the first retired year's tax
+is a back-payment with next July's settlement, and the years after pay
+theirs in advance. A statutorily insured earner joins the
+Krankenversicherung der Rentner: half the health contribution and the whole
+care contribution come out of the pension and are deducted in full. A
 privately insured one keeps the contract, and the pension fund pays half the
 health premium, up to what it would carry in the KVdR (§106 SGB VI) — offset
 against the deduction, as the employer's subsidy was. The year of retirement
@@ -61,10 +79,9 @@ other private pension owes KVdR contributions.
 
 Deliberately out of scope in retirement: an early or deferred start (with
 its Abschläge or Zuschläge), a pension that began before the model start,
-Hinzuverdienst, Vorauszahlungen, survivors' pensions, a PKV premium falling
-when its statutory surcharge stops at 65, and children growing up —
-`n_children` keeps its Kindergeld and its care-rate effect for the whole
-horizon.
+Hinzuverdienst, survivors' pensions, a PKV premium falling when its
+statutory surcharge stops at 65, and children growing up — `n_children`
+keeps its Kindergeld and its care-rate effect for the whole horizon.
 """
 
 from __future__ import annotations
@@ -95,6 +112,7 @@ from ..german_tax import (
     pension_subsidy,
     private_deductible,
     private_subsidy,
+    quarterly_prepayment,
     retiree_contributions,
     social_contributions,
     taxable_income,
@@ -221,7 +239,10 @@ class HouseholdState:
     monthly_rebates: list[float]
     monthly_pensions: list[float]  # each earner's, at this year's Rentenwert
     year_index: int = 0
-    refund_due: float = 0.0  # last year's over-withholding, paid out in July
+    refund_due: float = 0.0  # last year's settlement, paid out in July; negative to pay
+    prepayment: float = 0.0  # the Vorauszahlung per date the last Bescheid set
+    monthly_prepayments: list[float] = field(default_factory=lambda: [0.0] * 12)
+    yearly_prepaid: float = 0.0  # this year's Vorauszahlungen, which its settlement credits
     monthly_net: float = 0.0  # the year's average; equal to every month's until a retirement
     monthly_nets: list[float] = field(default_factory=list)
     monthly_gross_total: float = 0.0
@@ -244,10 +265,11 @@ class GermanHousehold(FinancialComponent):
     the tax on two salaries is not the sum of two individually taxed ones.
     Reports the same `monthly_amount` key as `Salary`, so the flat
     `monthly_income` column keeps meaning "net cash per month" (the July
-    refund is reported separately and excluded from it); in a year someone
-    retires it is the average of the year's salary and pension months.
-    `monthly_gross` and `monthly_pension` are the salaries and statutory
-    pensions paid, averaged over the year the same way.
+    settlement and the Vorauszahlungen are reported separately and excluded
+    from it); in a year someone retires it is the average of the year's
+    salary and pension months. `monthly_gross` and `monthly_pension` are the
+    salaries and statutory pensions paid, averaged over the year the same
+    way.
 
     `tax` holds the whole 2026 parameter set and its inertia; being a nested
     value object it is sweepable: `model.replaced("household.tax",
@@ -513,6 +535,9 @@ class GermanHousehold(FinancialComponent):
                 CashFlow(CashPhase.INCOME, net),
                 CashFlow(CashPhase.INCOME, state.refund_due),
             )
+        prepaid = state.monthly_prepayments[ctx.month - 1]
+        if prepaid != 0.0:
+            return (CashFlow(CashPhase.INCOME, net), CashFlow(CashPhase.INCOME, -prepaid))
         return (CashFlow(CashPhase.INCOME, net),)
 
     def year_assess(self, state: HouseholdState, ctx: YearContext) -> None:
@@ -568,8 +593,33 @@ class GermanHousehold(FinancialComponent):
         )
         state.yearly_assessed = assessment.total
 
+    def _schedule_prepayments(self, state: HouseholdState) -> None:
+        """Next year's Vorauszahlungen, as the Bescheid on this year sets them.
+
+        The Bescheid comes with next July's settlement. On 10 March and 10
+        June before it the rate in force is paid; after it the year's new
+        amount less those two is spread over 10 September and 10 December —
+        how the Finanzverwaltung NRW describes a change before the last date,
+        so a cut below what was paid comes back on them — and the years after
+        pay the new rate on all four dates. Runs after the row, so it
+        replaces this year's schedule only once that has been reported.
+        """
+        rate = quarterly_prepayment(
+            state.yearly_assessed - state.yearly_withheld, self.tax, in_force=state.prepayment
+        )
+        early = state.prepayment
+        late = 2.0 * rate - early
+        schedule = [0.0, 0.0, early, 0.0, 0.0, early, 0.0, 0.0, late, 0.0, 0.0, late]
+        prepaid = 0.0
+        for amount in schedule:
+            prepaid += amount
+        state.monthly_prepayments = schedule
+        state.yearly_prepaid = prepaid
+        state.prepayment = rate
+
     def year_grow(self, state: HouseholdState, ctx: YearContext) -> None:
-        state.refund_due = state.yearly_withheld - state.yearly_assessed
+        state.refund_due = state.yearly_withheld + state.yearly_prepaid - state.yearly_assessed
+        self._schedule_prepayments(state)
         for index, earner in enumerate(self.earners):
             state.monthly_gross[index] *= 1.0 + earner.yearly_increase_rate
             if earner.private_health is not None:
@@ -597,6 +647,7 @@ class GermanHousehold(FinancialComponent):
             "monthly_pension": state.monthly_pension_total,
             "yearly_assessed_tax": state.yearly_assessed,
             "yearly_withheld_tax": state.yearly_withheld,
+            "yearly_prepaid_tax": state.yearly_prepaid,
             "yearly_refund_received": state.refund_due,
             "yearly_social_contributions": state.yearly_social,
             "yearly_rental_result": state.yearly_rental_result,

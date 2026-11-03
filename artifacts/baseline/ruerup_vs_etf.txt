@@ -284,11 +284,11 @@ Effective return:        3.78% a year, 1.22 points of costs (the PIB states 1.23
 market return                        3%              5%              7%
 tax refunds              €109,461 (47%)  €109,461 (47%)  €109,461 (47%)
 Rürup capital at 67            €339,331        €526,447        €842,570
-extra ETF wealth at 67         €209,979        €325,101        €525,601
+extra ETF wealth at 67         €209,804        €324,794        €525,158
 net pension, guaranteed            €479            €741          €1,182
 break-even, guaranteed        after 100       after 100       after 100
 net pension, 2024 basis            €911          €1,407          €2,234
-break-even, 2024 basis             95.3       after 100       after 100
+break-even, 2024 basis             95.4       after 100       after 100
 [text/html]
 <div>
 <style scoped>
@@ -328,9 +328,9 @@ break-even, 2024 basis             95.3       after 100       after 100
     </tr>
     <tr>
       <th>extra ETF wealth at 67</th>
-      <td>€209,979</td>
-      <td>€325,101</td>
-      <td>€525,601</td>
+      <td>€209,804</td>
+      <td>€324,794</td>
+      <td>€525,158</td>
     </tr>
     <tr>
       <th>net pension, guaranteed</th>
@@ -352,7 +352,7 @@ break-even, 2024 basis             95.3       after 100       after 100
     </tr>
     <tr>
       <th>break-even, 2024 basis</th>
-      <td>95.3</td>
+      <td>95.4</td>
       <td>after 100</td>
       <td>after 100</td>
     </tr>
@@ -365,10 +365,10 @@ break-even, 2024 basis             95.3       after 100       after 100
 ===== cell 10 =====
 [text/plain]
     statutory pensions                   tariff 3%: tax / break-even  \
-0  100% of placeholder     tariff creeps (2.5%)           34% / 95.3   
-1  100% of placeholder  tariff moves with wages           30% / 93.4   
-2   50% of placeholder     tariff creeps (2.5%)           25% / 90.4   
-3   50% of placeholder  tariff moves with wages           21% / 89.3   
+0  100% of placeholder     tariff creeps (2.5%)           34% / 95.4   
+1  100% of placeholder  tariff moves with wages           30% / 93.5   
+2   50% of placeholder     tariff creeps (2.5%)           25% / 90.5   
+3   50% of placeholder  tariff moves with wages           21% / 89.4   
 
   5%: tax / break-even 7%: tax / break-even  
 0      34% / after 100      35% / after 100  
@@ -406,7 +406,7 @@ break-even, 2024 basis             95.3       after 100       after 100
       <th>0</th>
       <td>100% of placeholder</td>
       <td>tariff creeps (2.5%)</td>
-      <td>34% / 95.3</td>
+      <td>34% / 95.4</td>
       <td>34% / after 100</td>
       <td>35% / after 100</td>
     </tr>
@@ -414,7 +414,7 @@ break-even, 2024 basis             95.3       after 100       after 100
       <th>1</th>
       <td>100% of placeholder</td>
       <td>tariff moves with wages</td>
-      <td>30% / 93.4</td>
+      <td>30% / 93.5</td>
       <td>30% / after 100</td>
       <td>30% / after 100</td>
     </tr>
@@ -422,7 +422,7 @@ break-even, 2024 basis             95.3       after 100       after 100
       <th>2</th>
       <td>50% of placeholder</td>
       <td>tariff creeps (2.5%)</td>
-      <td>25% / 90.4</td>
+      <td>25% / 90.5</td>
       <td>26% / after 100</td>
       <td>26% / after 100</td>
     </tr>
@@ -430,7 +430,7 @@ break-even, 2024 basis             95.3       after 100       after 100
       <th>3</th>
       <td>50% of placeholder</td>
       <td>tariff moves with wages</td>
-      <td>21% / 89.3</td>
+      <td>21% / 89.4</td>
       <td>22% / after 100</td>
       <td>23% / after 100</td>
     </tr>
@@ -443,24 +443,24 @@ market return                                               3%  \
 previous / engine                                                
 net pension                                        €891 / €911   
 tax on it                                            35% / 34%   
-extra ETF capital at 67                    €229,326 / €229,326   
-extra Abgeltungsteuer on sales, 67 to 100          — / €12,865   
-break-even                                         95.1 / 95.3   
+extra ETF capital at 67                    €229,326 / €229,110   
+extra Abgeltungsteuer on sales, 67 to 100             — / €898   
+break-even                                         95.1 / 95.4   
 
 market return                                                 5%  \
 previous / engine                                                  
 net pension                                      €1,376 / €1,407   
 tax on it                                              36% / 34%   
-extra ETF capital at 67                      €370,514 / €370,514   
-extra Abgeltungsteuer on sales, 67 to 100            — / €32,591   
+extra ETF capital at 67                      €370,514 / €370,138   
+extra Abgeltungsteuer on sales, 67 to 100             — / €1,921   
 break-even                                 after 100 / after 100   
 
 market return                                                 7%  
 previous / engine                                                 
 net pension                                      €2,185 / €2,234  
 tax on it                                              36% / 35%  
-extra ETF capital at 67                      €616,413 / €616,413  
-extra Abgeltungsteuer on sales, 67 to 100            — / €66,510  
+extra ETF capital at 67                      €616,413 / €615,870  
+extra Abgeltungsteuer on sales, 67 to 100             — / €3,589  
 break-even                                 after 100 / after 100  
 [text/html]
 <div>
@@ -507,19 +507,19 @@ break-even                                 after 100 / after 100
     </tr>
     <tr>
       <th>extra ETF capital at 67</th>
-      <td>€229,326 / €229,326</td>
-      <td>€370,514 / €370,514</td>
-      <td>€616,413 / €616,413</td>
+      <td>€229,326 / €229,110</td>
+      <td>€370,514 / €370,138</td>
+      <td>€616,413 / €615,870</td>
     </tr>
     <tr>
       <th>extra Abgeltungsteuer on sales, 67 to 100</th>
-      <td>— / €12,865</td>
-      <td>— / €32,591</td>
-      <td>— / €66,510</td>
+      <td>— / €898</td>
+      <td>— / €1,921</td>
+      <td>— / €3,589</td>
     </tr>
     <tr>
       <th>break-even</th>
-      <td>95.1 / 95.3</td>
+      <td>95.1 / 95.4</td>
       <td>after 100 / after 100</td>
       <td>after 100 / after 100</td>
     </tr>
@@ -542,21 +542,21 @@ top-up / month
 
                3%: extra ETF wealth at 67 3%: break-even 5%: pension  \
 top-up / month                                                         
-€250                             €100,953           95.8      €1,007   
-€500                             €202,633           96.2      €2,013   
-€1,000                           €408,010           96.8      €4,026   
-€1,500                           €615,741           97.4      €6,039   
-€1,848                           €761,601           97.8      €7,440   
-€2,500                         €1,068,867      after 100     €10,065   
+€250                             €100,887           96.0      €1,007   
+€500                             €202,495           96.3      €2,013   
+€1,000                           €407,808           96.9      €4,026   
+€1,500                           €615,539           97.5      €6,039   
+€1,848                           €761,399           98.0      €7,440   
+€2,500                         €1,068,664      after 100     €10,065   
 
                5%: extra ETF wealth at 67 5%: break-even  
 top-up / month                                            
-€250                             €154,592      after 100  
-€500                             €310,349      after 100  
-€1,000                           €625,001      after 100  
-€1,500                           €943,483      after 100  
-€1,848                         €1,167,275      after 100  
-€2,500                         €1,648,988      after 100  
+€250                             €154,477      after 100  
+€500                             €310,110      after 100  
+€1,000                           €624,651      after 100  
+€1,500                           €943,132      after 100  
+€1,848                         €1,166,924      after 100  
+€2,500                         €1,648,637      after 100  
 [text/html]
 <div>
 <style scoped>
@@ -600,60 +600,60 @@ top-up / month
       <th>€250</th>
       <td>42.0%</td>
       <td>€659</td>
-      <td>€100,953</td>
-      <td>95.8</td>
+      <td>€100,887</td>
+      <td>96.0</td>
       <td>€1,007</td>
-      <td>€154,592</td>
+      <td>€154,477</td>
       <td>after 100</td>
     </tr>
     <tr>
       <th>€500</th>
       <td>42.0%</td>
       <td>€1,317</td>
-      <td>€202,633</td>
-      <td>96.2</td>
+      <td>€202,495</td>
+      <td>96.3</td>
       <td>€2,013</td>
-      <td>€310,349</td>
+      <td>€310,110</td>
       <td>after 100</td>
     </tr>
     <tr>
       <th>€1,000</th>
       <td>41.7%</td>
       <td>€2,634</td>
-      <td>€408,010</td>
-      <td>96.8</td>
+      <td>€407,808</td>
+      <td>96.9</td>
       <td>€4,026</td>
-      <td>€625,001</td>
+      <td>€624,651</td>
       <td>after 100</td>
     </tr>
     <tr>
       <th>€1,500</th>
       <td>41.3%</td>
       <td>€3,952</td>
-      <td>€615,741</td>
-      <td>97.4</td>
+      <td>€615,539</td>
+      <td>97.5</td>
       <td>€6,039</td>
-      <td>€943,483</td>
+      <td>€943,132</td>
       <td>after 100</td>
     </tr>
     <tr>
       <th>€1,848</th>
       <td>40.9%</td>
       <td>€4,868</td>
-      <td>€761,601</td>
-      <td>97.8</td>
+      <td>€761,399</td>
+      <td>98.0</td>
       <td>€7,440</td>
-      <td>€1,167,275</td>
+      <td>€1,166,924</td>
       <td>after 100</td>
     </tr>
     <tr>
       <th>€2,500</th>
       <td>30.2%</td>
       <td>€6,586</td>
-      <td>€1,068,867</td>
+      <td>€1,068,664</td>
       <td>after 100</td>
       <td>€10,065</td>
-      <td>€1,648,988</td>
+      <td>€1,648,637</td>
       <td>after 100</td>
     </tr>
   </tbody>

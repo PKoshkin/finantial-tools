@@ -198,14 +198,36 @@ class TestTheStatutoryRetiree:
         zve = 36_000.0 - 102.0 - 12 * health - 12 * care - system.special_expenses_allowance
         assert frame.loc[33, "household.yearly_assessed_tax"] == income_tax(zve, system)
 
-    def test_the_tax_is_a_back_payment_next_july(self):
-        frame = run(self.household(retiring(RETIRED_2058, 3_000.0)), years=35)
-        assert frame.loc[34, "household.yearly_assessed_tax"] > 0.0
-        for year in (34, 35):
-            assert frame.loc[year, "household.yearly_withheld_tax"] == 0.0
-            assert frame.loc[year, "household.yearly_refund_received"] == -frame.loc[
-                year - 1, "household.yearly_assessed_tax"
-            ]
+    def test_the_first_years_tax_is_paid_next_july_then_in_advance(self):
+        # Nothing is withheld, and the years before left nothing to pay, so
+        # the first retired year owes its whole tax with the next July's
+        # settlement. That Bescheid sets the Vorauszahlungen: from then on
+        # each year pays the last assessment's tax in advance, and July
+        # settles only the change — a small refund here, as the drifting
+        # tariff lowers the tax on a flat pension a little every year.
+        frame = run(self.household(retiring(RETIRED_2058, 6_000.0)), years=36)
+        tax = frame["household.yearly_assessed_tax"]
+        prepaid = frame["household.yearly_prepaid_tax"]
+        refund = frame["household.yearly_refund_received"]
+        assert (frame.loc[33:, "household.yearly_withheld_tax"] == 0.0).all()
+        assert prepaid[33] == 0.0
+        assert refund[34] == -tax[33]
+        for year in (34, 35, 36):
+            assert prepaid[year] == pytest.approx(tax[year - 1])
+        for year in (35, 36):
+            assert refund[year] == pytest.approx(tax[year - 2] - tax[year - 1])
+            assert 0.0 < refund[year] < 0.05 * tax[year - 1]
+
+    def test_no_vorauszahlungen_under_400_euros_a_year(self):
+        # A smaller pension, whose tax the drifting tariff takes under 400 EUR
+        # in the third retired year: the Finanzamt stops asking in advance.
+        frame = run(self.household(retiring(RETIRED_2058, 3_000.0)), years=37)
+        tax = frame["household.yearly_assessed_tax"]
+        prepaid = frame["household.yearly_prepaid_tax"]
+        assert tax[34] >= 400.0 > tax[35]
+        assert prepaid[35] == pytest.approx(tax[34])
+        assert prepaid[36] == prepaid[37] == 0.0
+        assert frame.loc[37, "household.yearly_refund_received"] == -tax[36]
 
     def test_two_pensioners_take_two_allowances(self):
         frame = run(self.household(retiring(RETIRED_2058, 2_000.0), retiring(RETIRED_2058, 1_000.0)), years=33)
