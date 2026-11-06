@@ -1,0 +1,1667 @@
+===== cell 2 =====
+[stdout]
+Statutory pension at today's Rentenwert: €3,263 a month
+Deduction room in 2026: €12,226 a year, €1,019 a month; the contract needs €9,000
+A 6% real market is 8.12% nominal in the engine
+
+===== cell 4 =====
+[text/plain]
+                    capital at 67 (capital) pension, guaranteed, a month  \
+market return, real                                                        
+2%                                 €284,894                         €605   
+3%                                 €355,277                         €755   
+4%                                 €446,430                         €949   
+5%                                 €564,839                       €1,200   
+6%                                 €719,047                       €1,528   
+7%                                 €920,302                       €1,955   
+8%                               €1,183,410                       €2,514   
+
+                    pension, 2024 basis, a month  \
+market return, real                                
+2%                                        €1,156   
+3%                                        €1,442   
+4%                                        €1,812   
+5%                                        €2,292   
+6%                                        €2,918   
+7%                                        €3,735   
+8%                                        €4,802   
+
+                    the same money in the ETF, gross (capital)  
+market return, real                                             
+2%                                                    €354,472  
+3%                                                    €446,833  
+4%                                                    €567,419  
+5%                                                    €725,275  
+6%                                                    €932,372  
+7%                                                  €1,204,545  
+8%                                                  €1,562,730  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>capital at 67 (capital)</th>
+      <th>pension, guaranteed, a month</th>
+      <th>pension, 2024 basis, a month</th>
+      <th>the same money in the ETF, gross (capital)</th>
+    </tr>
+    <tr>
+      <th>market return, real</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2%</th>
+      <td>€284,894</td>
+      <td>€605</td>
+      <td>€1,156</td>
+      <td>€354,472</td>
+    </tr>
+    <tr>
+      <th>3%</th>
+      <td>€355,277</td>
+      <td>€755</td>
+      <td>€1,442</td>
+      <td>€446,833</td>
+    </tr>
+    <tr>
+      <th>4%</th>
+      <td>€446,430</td>
+      <td>€949</td>
+      <td>€1,812</td>
+      <td>€567,419</td>
+    </tr>
+    <tr>
+      <th>5%</th>
+      <td>€564,839</td>
+      <td>€1,200</td>
+      <td>€2,292</td>
+      <td>€725,275</td>
+    </tr>
+    <tr>
+      <th>6%</th>
+      <td>€719,047</td>
+      <td>€1,528</td>
+      <td>€2,918</td>
+      <td>€932,372</td>
+    </tr>
+    <tr>
+      <th>7%</th>
+      <td>€920,302</td>
+      <td>€1,955</td>
+      <td>€3,735</td>
+      <td>€1,204,545</td>
+    </tr>
+    <tr>
+      <th>8%</th>
+      <td>€1,183,410</td>
+      <td>€2,514</td>
+      <td>€4,802</td>
+      <td>€1,562,730</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 5 =====
+[text/plain]
+                                         capital at 67, 6% real market (capital)  \
+                                                                                   
+no costs at all                                                         €990,547   
++ 2.5% acquisition cost, over five years                                €926,657   
++ 4.5% of every contribution                                            €882,083   
++ 0.40% a year on the value                                             €794,012   
++ the funds' own 0.38% a year                                           €719,047   
+
+                                         this layer takes (capital)  
+                                                                     
+no costs at all                                                      
++ 2.5% acquisition cost, over five years                    €63,890  
++ 4.5% of every contribution                                €44,575  
++ 0.40% a year on the value                                 €88,070  
++ the funds' own 0.38% a year                               €74,965  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>capital at 67, 6% real market (capital)</th>
+      <th>this layer takes (capital)</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>no costs at all</th>
+      <td>€990,547</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>+ 2.5% acquisition cost, over five years</th>
+      <td>€926,657</td>
+      <td>€63,890</td>
+    </tr>
+    <tr>
+      <th>+ 4.5% of every contribution</th>
+      <td>€882,083</td>
+      <td>€44,575</td>
+    </tr>
+    <tr>
+      <th>+ 0.40% a year on the value</th>
+      <td>€794,012</td>
+      <td>€88,070</td>
+    </tr>
+    <tr>
+      <th>+ the funds' own 0.38% a year</th>
+      <td>€719,047</td>
+      <td>€74,965</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 6 =====
+[stdout]
+The contract's refunds: €156,416 nominal over 38 Julys, €107,651 in today's euros, 46% of what was paid in; spent in B, invested in B+
+
+[text/plain]
+                                               unit     A: ETF  \
+                                                                 
+ETF, gross                                  capital   €944,268   
+  of which gain over what was paid in       capital   €783,829   
+  gain as a share of the ETF                      %      83.0%   
+  tax rate on the gain: 26.375% on 70%            %     18.46%   
+  tax if all of it were sold                capital  €-144,714   
+= ETF after tax                             capital   €799,554   
+contract capital converted at Rentenbeginn  capital              
+  pension, guaranteed                       a month              
+  pension, 2024 basis                       a month              
+
+                                           B: contract, refund spent  \
+                                                                       
+ETF, gross                                                             
+  of which gain over what was paid in                                  
+  gain as a share of the ETF                                           
+  tax rate on the gain: 26.375% on 70%                                 
+  tax if all of it were sold                                           
+= ETF after tax                                                        
+contract capital converted at Rentenbeginn                  €719,047   
+  pension, guaranteed                                         €1,528   
+  pension, 2024 basis                                         €2,918   
+
+                                           B+: contract, refund invested  
+                                                                          
+ETF, gross                                                      €408,239  
+  of which gain over what was paid in                           €334,538  
+  gain as a share of the ETF                                       81.9%  
+  tax rate on the gain: 26.375% on 70%                            18.46%  
+  tax if all of it were sold                                    €-61,764  
+= ETF after tax                                                 €346,475  
+contract capital converted at Rentenbeginn                      €719,047  
+  pension, guaranteed                                             €1,528  
+  pension, 2024 basis                                             €2,918  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>unit</th>
+      <th>A: ETF</th>
+      <th>B: contract, refund spent</th>
+      <th>B+: contract, refund invested</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ETF, gross</th>
+      <td>capital</td>
+      <td>€944,268</td>
+      <td></td>
+      <td>€408,239</td>
+    </tr>
+    <tr>
+      <th>of which gain over what was paid in</th>
+      <td>capital</td>
+      <td>€783,829</td>
+      <td></td>
+      <td>€334,538</td>
+    </tr>
+    <tr>
+      <th>gain as a share of the ETF</th>
+      <td>%</td>
+      <td>83.0%</td>
+      <td></td>
+      <td>81.9%</td>
+    </tr>
+    <tr>
+      <th>tax rate on the gain: 26.375% on 70%</th>
+      <td>%</td>
+      <td>18.46%</td>
+      <td></td>
+      <td>18.46%</td>
+    </tr>
+    <tr>
+      <th>tax if all of it were sold</th>
+      <td>capital</td>
+      <td>€-144,714</td>
+      <td></td>
+      <td>€-61,764</td>
+    </tr>
+    <tr>
+      <th>= ETF after tax</th>
+      <td>capital</td>
+      <td>€799,554</td>
+      <td></td>
+      <td>€346,475</td>
+    </tr>
+    <tr>
+      <th>contract capital converted at Rentenbeginn</th>
+      <td>capital</td>
+      <td></td>
+      <td>€719,047</td>
+      <td>€719,047</td>
+    </tr>
+    <tr>
+      <th>pension, guaranteed</th>
+      <td>a month</td>
+      <td></td>
+      <td>€1,528</td>
+      <td>€1,528</td>
+    </tr>
+    <tr>
+      <th>pension, 2024 basis</th>
+      <td>a month</td>
+      <td></td>
+      <td>€2,918</td>
+      <td>€2,918</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 7 =====
+[text/plain]
+                                              unit    A: ETF  \
+                                                               
+statutory pension, gross                   a month    €3,199   
+  after health and care premiums           a month    €2,605   
+Basisrente pension, 2024 basis             a month        €0   
+  the same at the guaranteed factor        a month        €0   
+income tax on all of it                    a month     €-367   
+  as a share of the gross pensions               %     11.5%   
+  marginal rate on the Basisrente pension        %             
+= pensions net                             a month    €2,238   
+ETF after tax, end of 2063                 capital  €783,876   
+  3% a year of it, paid out                a month    €1,960   
+  4% a year of it, paid out                a month    €2,613   
+  drawn down to zero by 100                a month    €5,620   
+TOTAL with the 3% withdrawal               a month    €4,198   
+TOTAL with the 4% withdrawal               a month    €4,851   
+TOTAL with the drawdown to 100             a month    €7,858   
+
+                                          B: contract, refund spent  \
+                                                                      
+statutory pension, gross                                     €3,199   
+  after health and care premiums                             €2,605   
+Basisrente pension, 2024 basis                               €2,861   
+  the same at the guaranteed factor                          €1,498   
+income tax on all of it                                     €-1,300   
+  as a share of the gross pensions                            21.4%   
+  marginal rate on the Basisrente pension                     32.6%   
+= pensions net                                               €4,166   
+ETF after tax, end of 2063                                       €0   
+  3% a year of it, paid out                                      €0   
+  4% a year of it, paid out                                      €0   
+  drawn down to zero by 100                                      €0   
+TOTAL with the 3% withdrawal                                 €4,166   
+TOTAL with the 4% withdrawal                                 €4,166   
+TOTAL with the drawdown to 100                               €4,166   
+
+                                          B+: contract, refund invested  
+                                                                         
+statutory pension, gross                                         €3,199  
+  after health and care premiums                                 €2,605  
+Basisrente pension, 2024 basis                                   €2,861  
+  the same at the guaranteed factor                              €1,498  
+income tax on all of it                                         €-1,300  
+  as a share of the gross pensions                                21.4%  
+  marginal rate on the Basisrente pension                         32.6%  
+= pensions net                                                   €4,166  
+ETF after tax, end of 2063                                     €339,682  
+  3% a year of it, paid out                                        €849  
+  4% a year of it, paid out                                      €1,132  
+  drawn down to zero by 100                                      €2,435  
+TOTAL with the 3% withdrawal                                     €5,015  
+TOTAL with the 4% withdrawal                                     €5,298  
+TOTAL with the drawdown to 100                                   €6,601  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>unit</th>
+      <th>A: ETF</th>
+      <th>B: contract, refund spent</th>
+      <th>B+: contract, refund invested</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>statutory pension, gross</th>
+      <td>a month</td>
+      <td>€3,199</td>
+      <td>€3,199</td>
+      <td>€3,199</td>
+    </tr>
+    <tr>
+      <th>after health and care premiums</th>
+      <td>a month</td>
+      <td>€2,605</td>
+      <td>€2,605</td>
+      <td>€2,605</td>
+    </tr>
+    <tr>
+      <th>Basisrente pension, 2024 basis</th>
+      <td>a month</td>
+      <td>€0</td>
+      <td>€2,861</td>
+      <td>€2,861</td>
+    </tr>
+    <tr>
+      <th>the same at the guaranteed factor</th>
+      <td>a month</td>
+      <td>€0</td>
+      <td>€1,498</td>
+      <td>€1,498</td>
+    </tr>
+    <tr>
+      <th>income tax on all of it</th>
+      <td>a month</td>
+      <td>€-367</td>
+      <td>€-1,300</td>
+      <td>€-1,300</td>
+    </tr>
+    <tr>
+      <th>as a share of the gross pensions</th>
+      <td>%</td>
+      <td>11.5%</td>
+      <td>21.4%</td>
+      <td>21.4%</td>
+    </tr>
+    <tr>
+      <th>marginal rate on the Basisrente pension</th>
+      <td>%</td>
+      <td></td>
+      <td>32.6%</td>
+      <td>32.6%</td>
+    </tr>
+    <tr>
+      <th>= pensions net</th>
+      <td>a month</td>
+      <td>€2,238</td>
+      <td>€4,166</td>
+      <td>€4,166</td>
+    </tr>
+    <tr>
+      <th>ETF after tax, end of 2063</th>
+      <td>capital</td>
+      <td>€783,876</td>
+      <td>€0</td>
+      <td>€339,682</td>
+    </tr>
+    <tr>
+      <th>3% a year of it, paid out</th>
+      <td>a month</td>
+      <td>€1,960</td>
+      <td>€0</td>
+      <td>€849</td>
+    </tr>
+    <tr>
+      <th>4% a year of it, paid out</th>
+      <td>a month</td>
+      <td>€2,613</td>
+      <td>€0</td>
+      <td>€1,132</td>
+    </tr>
+    <tr>
+      <th>drawn down to zero by 100</th>
+      <td>a month</td>
+      <td>€5,620</td>
+      <td>€0</td>
+      <td>€2,435</td>
+    </tr>
+    <tr>
+      <th>TOTAL with the 3% withdrawal</th>
+      <td>a month</td>
+      <td>€4,198</td>
+      <td>€4,166</td>
+      <td>€5,015</td>
+    </tr>
+    <tr>
+      <th>TOTAL with the 4% withdrawal</th>
+      <td>a month</td>
+      <td>€4,851</td>
+      <td>€4,166</td>
+      <td>€5,298</td>
+    </tr>
+    <tr>
+      <th>TOTAL with the drawdown to 100</th>
+      <td>a month</td>
+      <td>€7,858</td>
+      <td>€4,166</td>
+      <td>€6,601</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 8 =====
+[stdout]
+2024 basis: A's ETF runs out at after 100, falls behind B+'s refund ETF at after 100
+guaranteed: A's ETF runs out at after 100, falls behind B+'s refund ETF at after 100
+
+[text/plain]
+    B's extra net income, a month  \
+age                                 
+67                                  
+74                         €1,742   
+84                         €1,466   
+94                         €1,229   
+100                        €1,105   
+
+    A's ETF after paying it, after tax (capital)  \
+age                                                
+67                                      €799,554   
+74                                      €978,033   
+84                                    €1,438,680   
+94                                    €2,293,996   
+100                                   €3,109,570   
+
+    B+'s refund ETF, after tax (capital)  
+age                                       
+67                              €346,475  
+74                              €505,391  
+84                              €876,063  
+94                            €1,528,712  
+100                           €2,138,521  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>B's extra net income, a month</th>
+      <th>A's ETF after paying it, after tax (capital)</th>
+      <th>B+'s refund ETF, after tax (capital)</th>
+    </tr>
+    <tr>
+      <th>age</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>67</th>
+      <td></td>
+      <td>€799,554</td>
+      <td>€346,475</td>
+    </tr>
+    <tr>
+      <th>74</th>
+      <td>€1,742</td>
+      <td>€978,033</td>
+      <td>€505,391</td>
+    </tr>
+    <tr>
+      <th>84</th>
+      <td>€1,466</td>
+      <td>€1,438,680</td>
+      <td>€876,063</td>
+    </tr>
+    <tr>
+      <th>94</th>
+      <td>€1,229</td>
+      <td>€2,293,996</td>
+      <td>€1,528,712</td>
+    </tr>
+    <tr>
+      <th>100</th>
+      <td>€1,105</td>
+      <td>€3,109,570</td>
+      <td>€2,138,521</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 9 =====
+[text/plain]
+<Figure size 1200x600 with 1 Axes>
+===== cell 10 =====
+[text/plain]
+market return, real                               3%         4%         6%  \
+A: ETF after tax at 67 (capital)            €396,845   €496,698   €799,554   
+B: contract capital at 67 (capital)         €355,277   €446,430   €719,047   
+B+: refund ETF after tax at 67 (capital)    €176,515   €219,087   €346,475   
+B's extra net income, 2024 basis, a month       €988     €1,231     €1,928   
+  the same, guaranteed, a month                 €526       €658     €1,045   
+A's ETF runs out, 2024 basis               after 100  after 100  after 100   
+A's ETF falls behind B+, 2024 basis        after 100  after 100  after 100   
+A's ETF runs out, guaranteed               after 100  after 100  after 100   
+A's ETF falls behind B+, guaranteed        after 100  after 100  after 100   
+
+market return, real                                8%  
+A: ETF after tax at 67 (capital)           €1,324,116  
+B: contract capital at 67 (capital)        €1,183,410  
+B+: refund ETF after tax at 67 (capital)     €563,277  
+B's extra net income, 2024 basis, a month      €3,020  
+  the same, guaranteed, a month                €1,678  
+A's ETF runs out, 2024 basis                after 100  
+A's ETF falls behind B+, 2024 basis         after 100  
+A's ETF runs out, guaranteed                after 100  
+A's ETF falls behind B+, guaranteed         after 100  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>market return, real</th>
+      <th>3%</th>
+      <th>4%</th>
+      <th>6%</th>
+      <th>8%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A: ETF after tax at 67 (capital)</th>
+      <td>€396,845</td>
+      <td>€496,698</td>
+      <td>€799,554</td>
+      <td>€1,324,116</td>
+    </tr>
+    <tr>
+      <th>B: contract capital at 67 (capital)</th>
+      <td>€355,277</td>
+      <td>€446,430</td>
+      <td>€719,047</td>
+      <td>€1,183,410</td>
+    </tr>
+    <tr>
+      <th>B+: refund ETF after tax at 67 (capital)</th>
+      <td>€176,515</td>
+      <td>€219,087</td>
+      <td>€346,475</td>
+      <td>€563,277</td>
+    </tr>
+    <tr>
+      <th>B's extra net income, 2024 basis, a month</th>
+      <td>€988</td>
+      <td>€1,231</td>
+      <td>€1,928</td>
+      <td>€3,020</td>
+    </tr>
+    <tr>
+      <th>the same, guaranteed, a month</th>
+      <td>€526</td>
+      <td>€658</td>
+      <td>€1,045</td>
+      <td>€1,678</td>
+    </tr>
+    <tr>
+      <th>A's ETF runs out, 2024 basis</th>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>A's ETF falls behind B+, 2024 basis</th>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>A's ETF runs out, guaranteed</th>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>A's ETF falls behind B+, guaranteed</th>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+      <td>after 100</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 11 =====
+[text/plain]
+                   tax saved, a month contract value (capital)  \
+year                                                             
+1 (2026), age 30                 €346                   €6,980   
+2 (2027), age 31                 €339                  €14,184   
+5 (2030), age 34                 €319                  €37,290   
+10 (2035), age 39                €289                  €90,109   
+20 (2045), age 49                €237                 €232,897   
+30 (2055), age 59                €195                 €454,375   
+38 (2063), age 67                €-90                       €0   
+39 (2064), age 68                                           €0   
+45 (2070), age 74                                           €0   
+55 (2080), age 84                                           €0   
+65 (2090), age 94                                           €0   
+71 (2096), age 100                                          €0   
+
+                   pension, a month A's ETF after tax (capital)  \
+year                                                              
+1 (2026), age 30                                         €9,081   
+2 (2027), age 31                                        €18,382   
+5 (2030), age 34                                        €47,834   
+10 (2035), age 39                                      €103,545   
+20 (2045), age 49                                      €253,955   
+30 (2055), age 59                                      €494,551   
+38 (2063), age 67            €2,918                    €799,554   
+39 (2064), age 68            €2,861                    €843,537   
+45 (2070), age 74            €2,540                  €1,167,370   
+55 (2080), age 84            €2,084                  €2,025,034   
+65 (2090), age 94            €1,709                  €3,534,867   
+71 (2096), age 100           €1,518                  €4,945,491   
+
+                   B+'s refund ETF after tax (capital)  
+year                                                    
+1 (2026), age 30                                    €0  
+2 (2027), age 31                                €4,172  
+5 (2030), age 34                               €17,338  
+10 (2035), age 39                              €42,088  
+20 (2045), age 49                             €108,292  
+30 (2055), age 59                             €213,407  
+38 (2063), age 67                             €346,475  
+39 (2064), age 68                             €365,475  
+45 (2070), age 74                             €505,391  
+55 (2080), age 84                             €876,063  
+65 (2090), age 94                           €1,528,712  
+71 (2096), age 100                          €2,138,521  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tax saved, a month</th>
+      <th>contract value (capital)</th>
+      <th>pension, a month</th>
+      <th>A's ETF after tax (capital)</th>
+      <th>B+'s refund ETF after tax (capital)</th>
+    </tr>
+    <tr>
+      <th>year</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1 (2026), age 30</th>
+      <td>€346</td>
+      <td>€6,980</td>
+      <td></td>
+      <td>€9,081</td>
+      <td>€0</td>
+    </tr>
+    <tr>
+      <th>2 (2027), age 31</th>
+      <td>€339</td>
+      <td>€14,184</td>
+      <td></td>
+      <td>€18,382</td>
+      <td>€4,172</td>
+    </tr>
+    <tr>
+      <th>5 (2030), age 34</th>
+      <td>€319</td>
+      <td>€37,290</td>
+      <td></td>
+      <td>€47,834</td>
+      <td>€17,338</td>
+    </tr>
+    <tr>
+      <th>10 (2035), age 39</th>
+      <td>€289</td>
+      <td>€90,109</td>
+      <td></td>
+      <td>€103,545</td>
+      <td>€42,088</td>
+    </tr>
+    <tr>
+      <th>20 (2045), age 49</th>
+      <td>€237</td>
+      <td>€232,897</td>
+      <td></td>
+      <td>€253,955</td>
+      <td>€108,292</td>
+    </tr>
+    <tr>
+      <th>30 (2055), age 59</th>
+      <td>€195</td>
+      <td>€454,375</td>
+      <td></td>
+      <td>€494,551</td>
+      <td>€213,407</td>
+    </tr>
+    <tr>
+      <th>38 (2063), age 67</th>
+      <td>€-90</td>
+      <td>€0</td>
+      <td>€2,918</td>
+      <td>€799,554</td>
+      <td>€346,475</td>
+    </tr>
+    <tr>
+      <th>39 (2064), age 68</th>
+      <td></td>
+      <td>€0</td>
+      <td>€2,861</td>
+      <td>€843,537</td>
+      <td>€365,475</td>
+    </tr>
+    <tr>
+      <th>45 (2070), age 74</th>
+      <td></td>
+      <td>€0</td>
+      <td>€2,540</td>
+      <td>€1,167,370</td>
+      <td>€505,391</td>
+    </tr>
+    <tr>
+      <th>55 (2080), age 84</th>
+      <td></td>
+      <td>€0</td>
+      <td>€2,084</td>
+      <td>€2,025,034</td>
+      <td>€876,063</td>
+    </tr>
+    <tr>
+      <th>65 (2090), age 94</th>
+      <td></td>
+      <td>€0</td>
+      <td>€1,709</td>
+      <td>€3,534,867</td>
+      <td>€1,528,712</td>
+    </tr>
+    <tr>
+      <th>71 (2096), age 100</th>
+      <td></td>
+      <td>€0</td>
+      <td>€1,518</td>
+      <td>€4,945,491</td>
+      <td>€2,138,521</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 12 =====
+[stdout]
+Refund rate on the first euro: 47.0%; a net 150 € a month is 283 € gross
+
+===== cell 13 =====
+[stdout]
+Statutory pension alone, net, in 2064: €2,238 a month — the base every total starts from
+
+[text/plain]
+                                          1) ETF, 150 €  \
+contribution, gross                        €150 a month   
+refund, spent                                        €0   
+net cost                                   €150 a month   
+capital at 67 (capital)              €159,911 after tax   
+3% a year: payout net                              €392   
+3% a year: total net income                      €2,630   
+4% a year: payout net                              €523   
+4% a year: total net income                      €2,761   
+drawn down to 100: payout net                    €1,124   
+drawn down to 100: total net income              €3,362   
+guaranteed factor: pension net                            
+
+                                            2) depot, 150 €  \
+contribution, gross                            €150 a month   
+refund, spent                        €70 a month on average   
+net cost                                        €80 a month   
+capital at 67 (capital)                 €187,660 before tax   
+3% a year: payout net                                  €329   
+3% a year: total net income                          €2,568   
+4% a year: payout net                                  €437   
+4% a year: total net income                          €2,676   
+drawn down to 100: payout net                          €894   
+drawn down to 100: total net income                  €3,132   
+guaranteed factor: pension net                                
+
+                                    3) depot, 283 € (net 150)  \
+contribution, gross                              €283 a month   
+refund, spent                         €133 a month on average   
+net cost                                         €150 a month   
+capital at 67 (capital)                   €354,052 before tax   
+3% a year: payout net                                    €615   
+3% a year: total net income                            €2,853   
+4% a year: payout net                                    €814   
+4% a year: total net income                            €3,053   
+drawn down to 100: payout net                          €1,638   
+drawn down to 100: total net income                    €3,877   
+guaranteed factor: pension net                                  
+
+                                    4) Basisrente, 283 € (net 150)  
+contribution, gross                                   €283 a month  
+refund, spent                              €133 a month on average  
+net cost                                              €150 a month  
+capital at 67 (capital)                         €271,320 converted  
+3% a year: payout net                               €761 (pension)  
+3% a year: total net income                                 €2,999  
+4% a year: payout net                               €761 (pension)  
+4% a year: total net income                                 €2,999  
+drawn down to 100: payout net                       €761 (pension)  
+drawn down to 100: total net income                         €2,999  
+guaranteed factor: pension net                                €404  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>1) ETF, 150 €</th>
+      <th>2) depot, 150 €</th>
+      <th>3) depot, 283 € (net 150)</th>
+      <th>4) Basisrente, 283 € (net 150)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>contribution, gross</th>
+      <td>€150 a month</td>
+      <td>€150 a month</td>
+      <td>€283 a month</td>
+      <td>€283 a month</td>
+    </tr>
+    <tr>
+      <th>refund, spent</th>
+      <td>€0</td>
+      <td>€70 a month on average</td>
+      <td>€133 a month on average</td>
+      <td>€133 a month on average</td>
+    </tr>
+    <tr>
+      <th>net cost</th>
+      <td>€150 a month</td>
+      <td>€80 a month</td>
+      <td>€150 a month</td>
+      <td>€150 a month</td>
+    </tr>
+    <tr>
+      <th>capital at 67 (capital)</th>
+      <td>€159,911 after tax</td>
+      <td>€187,660 before tax</td>
+      <td>€354,052 before tax</td>
+      <td>€271,320 converted</td>
+    </tr>
+    <tr>
+      <th>3% a year: payout net</th>
+      <td>€392</td>
+      <td>€329</td>
+      <td>€615</td>
+      <td>€761 (pension)</td>
+    </tr>
+    <tr>
+      <th>3% a year: total net income</th>
+      <td>€2,630</td>
+      <td>€2,568</td>
+      <td>€2,853</td>
+      <td>€2,999</td>
+    </tr>
+    <tr>
+      <th>4% a year: payout net</th>
+      <td>€523</td>
+      <td>€437</td>
+      <td>€814</td>
+      <td>€761 (pension)</td>
+    </tr>
+    <tr>
+      <th>4% a year: total net income</th>
+      <td>€2,761</td>
+      <td>€2,676</td>
+      <td>€3,053</td>
+      <td>€2,999</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100: payout net</th>
+      <td>€1,124</td>
+      <td>€894</td>
+      <td>€1,638</td>
+      <td>€761 (pension)</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100: total net income</th>
+      <td>€3,362</td>
+      <td>€3,132</td>
+      <td>€3,877</td>
+      <td>€2,999</td>
+    </tr>
+    <tr>
+      <th>guaranteed factor: pension net</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>€404</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 14 =====
+[text/plain]
+                                                          1) ETF, 150 €  \
+tax on pension income                   payout rule                       
+15% (a small pension)                   3% a year                  €420   
+                                        4% a year                  €560   
+                                        drawn down to 100        €1,205   
+engine's own: ~30%                      3% a year                  €392   
+                                        4% a year                  €523   
+                                        drawn down to 100        €1,124   
+44.3% (42% + Soli, a 100k salary today) 3% a year                  €392   
+                                        4% a year                  €523   
+                                        drawn down to 100        €1,124   
+47.5% (45% + Soli, the top)             3% a year                  €392   
+                                        4% a year                  €523   
+                                        drawn down to 100        €1,124   
+
+                                                          2) depot, 150 €  \
+tax on pension income                   payout rule                         
+15% (a small pension)                   3% a year                    €391   
+                                        4% a year                    €521   
+                                        drawn down to 100          €1,082   
+engine's own: ~30%                      3% a year                    €329   
+                                        4% a year                    €437   
+                                        drawn down to 100            €894   
+44.3% (42% + Soli, a 100k salary today) 3% a year                    €256   
+                                        4% a year                    €342   
+                                        drawn down to 100            €709   
+47.5% (45% + Soli, the top)             3% a year                    €242   
+                                        4% a year                    €322   
+                                        drawn down to 100            €669   
+
+                                                          3) depot, 283 € (net 150)  \
+tax on pension income                   payout rule                                   
+15% (a small pension)                   3% a year                              €738   
+                                        4% a year                              €983   
+                                        drawn down to 100                    €2,042   
+engine's own: ~30%                      3% a year                              €615   
+                                        4% a year                              €814   
+                                        drawn down to 100                    €1,638   
+44.3% (42% + Soli, a 100k salary today) 3% a year                              €483   
+                                        4% a year                              €644   
+                                        drawn down to 100                    €1,338   
+47.5% (45% + Soli, the top)             3% a year                              €456   
+                                        4% a year                              €608   
+                                        drawn down to 100                    €1,262   
+
+                                                          4) Basisrente, 283 € (net 150)  \
+tax on pension income                   payout rule                                        
+15% (a small pension)                   3% a year                                   €918   
+                                        4% a year                                   €918   
+                                        drawn down to 100                           €918   
+engine's own: ~30%                      3% a year                                   €761   
+                                        4% a year                                   €761   
+                                        drawn down to 100                           €761   
+44.3% (42% + Soli, a 100k salary today) 3% a year                                   €601   
+                                        4% a year                                   €601   
+                                        drawn down to 100                           €601   
+47.5% (45% + Soli, the top)             3% a year                                   €567   
+                                        4% a year                                   €567   
+                                        drawn down to 100                           €567   
+
+                                                          4) Basisrente, guaranteed factor  
+tax on pension income                   payout rule                                         
+15% (a small pension)                   3% a year                                     €480  
+                                        4% a year                                     €480  
+                                        drawn down to 100                             €480  
+engine's own: ~30%                      3% a year                                     €404  
+                                        4% a year                                     €404  
+                                        drawn down to 100                             €404  
+44.3% (42% + Soli, a 100k salary today) 3% a year                                     €315  
+                                        4% a year                                     €315  
+                                        drawn down to 100                             €315  
+47.5% (45% + Soli, the top)             3% a year                                     €297  
+                                        4% a year                                     €297  
+                                        drawn down to 100                             €297  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>1) ETF, 150 €</th>
+      <th>2) depot, 150 €</th>
+      <th>3) depot, 283 € (net 150)</th>
+      <th>4) Basisrente, 283 € (net 150)</th>
+      <th>4) Basisrente, guaranteed factor</th>
+    </tr>
+    <tr>
+      <th>tax on pension income</th>
+      <th>payout rule</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="3" valign="top">15% (a small pension)</th>
+      <th>3% a year</th>
+      <td>€420</td>
+      <td>€391</td>
+      <td>€738</td>
+      <td>€918</td>
+      <td>€480</td>
+    </tr>
+    <tr>
+      <th>4% a year</th>
+      <td>€560</td>
+      <td>€521</td>
+      <td>€983</td>
+      <td>€918</td>
+      <td>€480</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100</th>
+      <td>€1,205</td>
+      <td>€1,082</td>
+      <td>€2,042</td>
+      <td>€918</td>
+      <td>€480</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">engine's own: ~30%</th>
+      <th>3% a year</th>
+      <td>€392</td>
+      <td>€329</td>
+      <td>€615</td>
+      <td>€761</td>
+      <td>€404</td>
+    </tr>
+    <tr>
+      <th>4% a year</th>
+      <td>€523</td>
+      <td>€437</td>
+      <td>€814</td>
+      <td>€761</td>
+      <td>€404</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100</th>
+      <td>€1,124</td>
+      <td>€894</td>
+      <td>€1,638</td>
+      <td>€761</td>
+      <td>€404</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">44.3% (42% + Soli, a 100k salary today)</th>
+      <th>3% a year</th>
+      <td>€392</td>
+      <td>€256</td>
+      <td>€483</td>
+      <td>€601</td>
+      <td>€315</td>
+    </tr>
+    <tr>
+      <th>4% a year</th>
+      <td>€523</td>
+      <td>€342</td>
+      <td>€644</td>
+      <td>€601</td>
+      <td>€315</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100</th>
+      <td>€1,124</td>
+      <td>€709</td>
+      <td>€1,338</td>
+      <td>€601</td>
+      <td>€315</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">47.5% (45% + Soli, the top)</th>
+      <th>3% a year</th>
+      <td>€392</td>
+      <td>€242</td>
+      <td>€456</td>
+      <td>€567</td>
+      <td>€297</td>
+    </tr>
+    <tr>
+      <th>4% a year</th>
+      <td>€523</td>
+      <td>€322</td>
+      <td>€608</td>
+      <td>€567</td>
+      <td>€297</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100</th>
+      <td>€1,124</td>
+      <td>€669</td>
+      <td>€1,262</td>
+      <td>€567</td>
+      <td>€297</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 15 =====
+[stdout]
+The contract's capital is 76.6% of the depot's; the costs take €82,732 of today's money by 67
+
+[text/plain]
+                                                   capital at 67 (capital)  \
+                                                                             
+the contract as it is                                             €271,320   
+without the acquisition cost: 2.5% of the contr...                €289,594   
+without the 4.5% of every contribution                            €303,240   
+without the 0.40% a year on the value                             €337,264   
+without the fund costs 0.38% a year, against th...                €354,052   
+= the depot                                                       €354,052   
+
+                                                   this factor adds (capital)  \
+                                                                                
+the contract as it is                                                           
+without the acquisition cost: 2.5% of the contr...                    €18,274   
+without the 4.5% of every contribution                                €13,646   
+without the 0.40% a year on the value                                 €34,025   
+without the fund costs 0.38% a year, against th...                    €16,788   
+= the depot                                                           €82,732   
+
+                                                   share, this order  \
+                                                                       
+the contract as it is                                                  
+without the acquisition cost: 2.5% of the contr...               22%   
+without the 4.5% of every contribution                           16%   
+without the 0.40% a year on the value                            41%   
+without the fund costs 0.38% a year, against th...               20%   
+= the depot                                                     100%   
+
+                                                   share, Shapley  
+                                                                   
+the contract as it is                                              
+without the acquisition cost: 2.5% of the contr...            25%  
+without the 4.5% of every contribution                        18%  
+without the 0.40% a year on the value                         40%  
+without the fund costs 0.38% a year, against th...            18%  
+= the depot                                                  100%  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>capital at 67 (capital)</th>
+      <th>this factor adds (capital)</th>
+      <th>share, this order</th>
+      <th>share, Shapley</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>the contract as it is</th>
+      <td>€271,320</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>without the acquisition cost: 2.5% of the contribution sum</th>
+      <td>€289,594</td>
+      <td>€18,274</td>
+      <td>22%</td>
+      <td>25%</td>
+    </tr>
+    <tr>
+      <th>without the 4.5% of every contribution</th>
+      <td>€303,240</td>
+      <td>€13,646</td>
+      <td>16%</td>
+      <td>18%</td>
+    </tr>
+    <tr>
+      <th>without the 0.40% a year on the value</th>
+      <td>€337,264</td>
+      <td>€34,025</td>
+      <td>41%</td>
+      <td>40%</td>
+    </tr>
+    <tr>
+      <th>without the fund costs 0.38% a year, against the ETF's 0.20%</th>
+      <td>€354,052</td>
+      <td>€16,788</td>
+      <td>20%</td>
+      <td>18%</td>
+    </tr>
+    <tr>
+      <th>= the depot</th>
+      <td>€354,052</td>
+      <td>€82,732</td>
+      <td>100%</td>
+      <td>100%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 16 =====
+[stdout]
+tax saved 2026–2062: depot €58,969, contract €58,969, difference €0
+2063, the year with ten contributions and two payout months: depot €-1,025, contract €-867 — the two months' payouts differ, nothing else does
+
+===== cell 17 =====
+[text/plain]
+                                                   gross, a month tax on it  \
+                                                                              
+contract, 2024 basis                                       €1,079     29.5%   
+contract, guaranteed factor                                  €565     28.6%   
+depot, 3% a year                                             €868     29.1%   
+depot, 4% a year                                           €1,157     29.6%   
+depot, drawn down to 100                                   €2,403     31.8%   
+depot, 4.87% a year: the contract's 2024 basis             €1,409     30.1%   
+depot, 2.55% a year: the contract's guaranteed ...           €737     28.9%   
+
+                                                   net, a month  \
+                                                                  
+contract, 2024 basis                                       €761   
+contract, guaranteed factor                                €404   
+depot, 3% a year                                           €615   
+depot, 4% a year                                           €814   
+depot, drawn down to 100                                 €1,638   
+depot, 4.87% a year: the contract's 2024 basis             €985   
+depot, 2.55% a year: the contract's guaranteed ...         €525   
+
+                                                   left at 80 (capital)  \
+                                                                          
+contract, 2024 basis                                                 €0   
+contract, guaranteed factor                                          €0   
+depot, 3% a year                                               €555,102   
+depot, 4% a year                                               €493,321   
+depot, drawn down to 100                                       €227,295   
+depot, 4.87% a year: the contract's 2024 basis                 €439,599   
+depot, 2.55% a year: the contract's guaranteed ...             €582,927   
+
+                                                   left at 90 (capital)  \
+                                                                          
+contract, 2024 basis                                                 €0   
+contract, guaranteed factor                                          €0   
+depot, 3% a year                                               €873,796   
+depot, 4% a year                                               €731,814   
+depot, drawn down to 100                                       €120,448   
+depot, 4.87% a year: the contract's 2024 basis                 €608,353   
+depot, 2.55% a year: the contract's guaranteed ...             €937,743   
+
+                                                   left at 100 (capital)  
+                                                                          
+contract, 2024 basis                                                  €0  
+contract, guaranteed factor                                           €0  
+depot, 3% a year                                              €1,451,290  
+depot, 4% a year                                              €1,174,551  
+depot, drawn down to 100                                              €0  
+depot, 4.87% a year: the contract's 2024 basis                  €933,912  
+depot, 2.55% a year: the contract's guaranteed ...            €1,575,928  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gross, a month</th>
+      <th>tax on it</th>
+      <th>net, a month</th>
+      <th>left at 80 (capital)</th>
+      <th>left at 90 (capital)</th>
+      <th>left at 100 (capital)</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>contract, 2024 basis</th>
+      <td>€1,079</td>
+      <td>29.5%</td>
+      <td>€761</td>
+      <td>€0</td>
+      <td>€0</td>
+      <td>€0</td>
+    </tr>
+    <tr>
+      <th>contract, guaranteed factor</th>
+      <td>€565</td>
+      <td>28.6%</td>
+      <td>€404</td>
+      <td>€0</td>
+      <td>€0</td>
+      <td>€0</td>
+    </tr>
+    <tr>
+      <th>depot, 3% a year</th>
+      <td>€868</td>
+      <td>29.1%</td>
+      <td>€615</td>
+      <td>€555,102</td>
+      <td>€873,796</td>
+      <td>€1,451,290</td>
+    </tr>
+    <tr>
+      <th>depot, 4% a year</th>
+      <td>€1,157</td>
+      <td>29.6%</td>
+      <td>€814</td>
+      <td>€493,321</td>
+      <td>€731,814</td>
+      <td>€1,174,551</td>
+    </tr>
+    <tr>
+      <th>depot, drawn down to 100</th>
+      <td>€2,403</td>
+      <td>31.8%</td>
+      <td>€1,638</td>
+      <td>€227,295</td>
+      <td>€120,448</td>
+      <td>€0</td>
+    </tr>
+    <tr>
+      <th>depot, 4.87% a year: the contract's 2024 basis</th>
+      <td>€1,409</td>
+      <td>30.1%</td>
+      <td>€985</td>
+      <td>€439,599</td>
+      <td>€608,353</td>
+      <td>€933,912</td>
+    </tr>
+    <tr>
+      <th>depot, 2.55% a year: the contract's guaranteed factor</th>
+      <td>€737</td>
+      <td>28.9%</td>
+      <td>€525</td>
+      <td>€582,927</td>
+      <td>€937,743</td>
+      <td>€1,575,928</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 18 =====
+[text/plain]
+                  depot net, a month contract net, a month  \
+depot rule                                                   
+3% a year                       €615                  €761   
+4% a year                       €814                  €761   
+drawn down to 100             €1,638                  €761   
+
+                  difference, a month of which the capital (costs)  \
+depot rule                                                           
+3% a year                        -146                         +224   
+4% a year                         +53                         +224   
+drawn down to 100                +877                         +224   
+
+                  of which the payout rate  taxation  
+depot rule                                            
+3% a year                             -370  the same  
+4% a year                             -171  the same  
+drawn down to 100                     +653  the same  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>depot net, a month</th>
+      <th>contract net, a month</th>
+      <th>difference, a month</th>
+      <th>of which the capital (costs)</th>
+      <th>of which the payout rate</th>
+      <th>taxation</th>
+    </tr>
+    <tr>
+      <th>depot rule</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3% a year</th>
+      <td>€615</td>
+      <td>€761</td>
+      <td>-146</td>
+      <td>+224</td>
+      <td>-370</td>
+      <td>the same</td>
+    </tr>
+    <tr>
+      <th>4% a year</th>
+      <td>€814</td>
+      <td>€761</td>
+      <td>+53</td>
+      <td>+224</td>
+      <td>-171</td>
+      <td>the same</td>
+    </tr>
+    <tr>
+      <th>drawn down to 100</th>
+      <td>€1,638</td>
+      <td>€761</td>
+      <td>+877</td>
+      <td>+224</td>
+      <td>+653</td>
+      <td>the same</td>
+    </tr>
+  </tbody>
+</table>
+</div>

@@ -68,7 +68,8 @@ Model semantics — the details that decide what the numbers mean:
   been emitted.
 - Rental taxation: a flat with `RentalTaxation` publishes its yearly
   Einkünfte aus Vermietung und Verpachtung (rent − deductible operating costs
-  − loan interest − AfA on `(price + fees) * building_share`) to the
+  − loan interest − AfA on `(price + fees) * building_share`, at a schedule
+  that may start with a special rate and stops at the write-off) to the
   `GermanHousehold`, which re-assesses the year's income tax with it — the
   cash effect rides the July settlement of the following year, and a
   profit's tax is asked for in advance from then on. Losses offset wage

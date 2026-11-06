@@ -124,15 +124,23 @@ class RentalTaxation:
     loan interest and AfA — to the model's `GermanHousehold`, whose assessed
     tax then moves accordingly (the cash arrives with the July settlement of
     the following year, and a profit's tax is then also asked for in
-    advance). The AfA base is `(price + purchase fees) * building_share`
-    and depreciates at `afa_rate` a year (§7 EStG: 2% for existing buildings,
-    3% for new ones), flat forever — the model does not stop depreciating
-    once the building is written off, which overstates the deduction beyond
-    `1 / afa_rate` years.
+    advance).
+
+    The AfA base is `(price + purchase fees) * building_share`. It
+    depreciates at `afa_rate` a year (§7 EStG: 2% for existing buildings, 3%
+    for new ones, or whatever a Restnutzungsdauer-Gutachten supports) plus,
+    in the first `special_afa_years` model years, `special_afa_rate` on top —
+    the shape of a Sonderabschreibung such as §7b (5% a year for four years)
+    or the degressive §7 Abs. 5a. The deduction stops once the base is
+    written off: the last year takes what is left, the years after deduct
+    nothing. Whether a given flat qualifies for the special rate is a
+    question for the tax adviser, not for the model.
     """
 
     afa_rate: float
     building_share: float
+    special_afa_rate: float = 0.0
+    special_afa_years: int = 0
 
     def __post_init__(self) -> None:
         check_amount(self.afa_rate, "afa_rate")
@@ -141,6 +149,21 @@ class RentalTaxation:
         check_amount(self.building_share, "building_share")
         if self.building_share > 1.0:
             raise ValueError("building_share must be within [0, 1]")
+        check_amount(self.special_afa_rate, "special_afa_rate")
+        if self.afa_rate + self.special_afa_rate > 1.0:
+            raise ValueError("afa_rate plus special_afa_rate must be within [0, 1]")
+        if not isinstance(self.special_afa_years, int) or isinstance(
+            self.special_afa_years, bool
+        ):
+            raise TypeError("special_afa_years must be an int")
+        if self.special_afa_years < 0:
+            raise ValueError("special_afa_years must be >= 0")
+
+    def yearly_rate(self, year: int) -> float:
+        """The share of the base deducted in model year `year`, before the write-off cap."""
+        if year <= self.special_afa_years:
+            return self.afa_rate + self.special_afa_rate
+        return self.afa_rate
 
 
 @dataclass(slots=True)
@@ -162,6 +185,7 @@ class PropertyState:
     monthly_deductible_costs: float = 0.0
     monthly_own_reserve: float = 0.0
     monthly_afa: float = 0.0
+    cumulative_afa: float = 0.0
     year_taxable_result: float = 0.0
     cumulative_cashflow: float = 0.0
 
@@ -417,7 +441,23 @@ class InvestmentProperty(_PropertyBase):
 
     @property
     def monthly_afa(self) -> float:
-        return 0.0 if self.taxation is None else self.afa_base * self.taxation.afa_rate / 12.0
+        """The first year's monthly AfA: the regular rate plus any special one."""
+        return self.yearly_afa(1, written_off=0.0) / 12.0
+
+    def yearly_afa(self, year: int, *, written_off: float) -> float:
+        """The AfA of model year `year`, given what the years before wrote off.
+
+        The year's rate on the base, capped by what of the base is still
+        left; nothing once the building is fully written off.
+        """
+        if self.taxation is None:
+            return 0.0
+        base = self.afa_base
+        remaining = base - written_off
+        if remaining <= 0.0:
+            return 0.0
+        yearly = base * self.taxation.yearly_rate(year)
+        return yearly if yearly <= remaining else remaining
 
     def _initial_rental_income(self) -> float:
         return self.monthly_rental_income
@@ -440,6 +480,12 @@ class InvestmentProperty(_PropertyBase):
         else:
             state.cumulative_cashflow = -(state.down_payment + state.purchase_fees)
         return state
+
+    def year_begin(self, state: PropertyState, ctx: YearContext) -> None:
+        super().year_begin(state, ctx)
+        # The year's AfA is decided at its start: the schedule's rate for
+        # this year, within what of the base the years before have left.
+        state.monthly_afa = self.yearly_afa(ctx.year, written_off=state.cumulative_afa) / 12.0
 
     def cash_flows(self, state: PropertyState, ctx: MonthContext) -> Sequence[CashFlow]:
         flows = [
@@ -473,6 +519,7 @@ class InvestmentProperty(_PropertyBase):
                 - state.year_interest
                 - 12.0 * state.monthly_afa
             )
+            state.cumulative_afa += 12.0 * state.monthly_afa
             ctx.add_taxable_income(state.year_taxable_result)
 
     def year_grow(self, state: PropertyState, ctx: YearContext) -> None:

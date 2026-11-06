@@ -1,0 +1,990 @@
+===== cell 2 =====
+[stdout]
+Deduction room left in 2026: €18,192 a year, €1,516 a month
+
+===== cell 4 =====
+[text/plain]
+                            broker's sheet   engine
+operating cash flow, year 1           €324     €324
+tax effect                         €13,152  €14,198
+after tax                          €13,476  €14,522
+after tax, a month                  €1,123   €1,210
+tax rate on the loss                   42%    45.5%
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>broker's sheet</th>
+      <th>engine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>operating cash flow, year 1</th>
+      <td>€324</td>
+      <td>€324</td>
+    </tr>
+    <tr>
+      <th>tax effect</th>
+      <td>€13,152</td>
+      <td>€14,198</td>
+    </tr>
+    <tr>
+      <th>after tax</th>
+      <td>€13,476</td>
+      <td>€14,522</td>
+    </tr>
+    <tr>
+      <th>after tax, a month</th>
+      <td>€1,123</td>
+      <td>€1,210</td>
+    </tr>
+    <tr>
+      <th>tax rate on the loss</th>
+      <td>42%</td>
+      <td>45.5%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 5 =====
+[stdout]
+Lead on day one: €-68,479 — the fees and the 3% a sale would cost
+
+[text/plain]
+             rent costs interest     AfA taxable result tax effect  \
+year                                                                 
+1 (2026)   €2,228  €411   €1,647  €3,094       €-32,554    €14,774   
+2 (2027)   €2,283  €419   €1,624  €3,094       €-31,664    €14,511   
+3 (2028)   €2,341  €428   €1,601  €3,094       €-30,745    €14,244   
+4 (2029)   €2,399  €436   €1,576  €3,094       €-29,796    €13,970   
+5 (2030)   €2,459  €445   €1,550  €1,346        €-7,842     €3,686   
+6 (2031)   €2,520  €454   €1,523  €1,346        €-6,830     €3,209   
+8 (2033)   €2,648  €472   €1,465  €1,346        €-4,708     €2,213   
+10 (2035)  €2,782  €491   €1,401  €1,346        €-2,443     €1,148   
+12 (2037)  €2,923  €511   €1,331  €1,346           €-25        €11   
+15 (2040)  €3,148  €542   €1,212  €1,346         €3,911    €-1,840   
+20 (2045)  €3,561  €599     €973  €1,346        €11,410    €-5,364   
+21 (2046)  €3,650  €611     €918  €1,049        €16,632    €-7,817   
+25 (2050)  €4,029  €661     €672      €0        €36,434   €-17,072   
+30 (2055)  €4,559  €730     €290      €0        €46,965   €-21,342   
+38 (2063)  €5,555  €855       €0      €0        €61,661   €-28,806   
+
+          cash after tax      loan lead over ETF  
+year                                              
+1 (2026)         €11,195  €417,381      €-47,408  
+2 (2027)         €11,502  €411,492      €-25,731  
+3 (2028)         €11,819  €405,320       €-2,995  
+4 (2029)         €12,145  €398,852       €20,857  
+5 (2030)          €2,476  €392,074       €35,881  
+6 (2031)          €2,630  €384,969       €51,761  
+8 (2033)          €2,945  €369,721       €85,419  
+10 (2035)         €3,260  €352,972      €121,774  
+12 (2037)         €3,575  €334,577      €161,043  
+15 (2040)         €4,046  €303,536      €225,940  
+20 (2045)         €4,807  €241,032      €352,255  
+21 (2046)         €3,279  €226,673      €378,833  
+25 (2050)        €-2,032  €162,006      €470,041  
+30 (2055)          €-774   €62,091      €604,372  
+38 (2063)        €27,587        €0      €878,734  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>rent</th>
+      <th>costs</th>
+      <th>interest</th>
+      <th>AfA</th>
+      <th>taxable result</th>
+      <th>tax effect</th>
+      <th>cash after tax</th>
+      <th>loan</th>
+      <th>lead over ETF</th>
+    </tr>
+    <tr>
+      <th>year</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1 (2026)</th>
+      <td>€2,228</td>
+      <td>€411</td>
+      <td>€1,647</td>
+      <td>€3,094</td>
+      <td>€-32,554</td>
+      <td>€14,774</td>
+      <td>€11,195</td>
+      <td>€417,381</td>
+      <td>€-47,408</td>
+    </tr>
+    <tr>
+      <th>2 (2027)</th>
+      <td>€2,283</td>
+      <td>€419</td>
+      <td>€1,624</td>
+      <td>€3,094</td>
+      <td>€-31,664</td>
+      <td>€14,511</td>
+      <td>€11,502</td>
+      <td>€411,492</td>
+      <td>€-25,731</td>
+    </tr>
+    <tr>
+      <th>3 (2028)</th>
+      <td>€2,341</td>
+      <td>€428</td>
+      <td>€1,601</td>
+      <td>€3,094</td>
+      <td>€-30,745</td>
+      <td>€14,244</td>
+      <td>€11,819</td>
+      <td>€405,320</td>
+      <td>€-2,995</td>
+    </tr>
+    <tr>
+      <th>4 (2029)</th>
+      <td>€2,399</td>
+      <td>€436</td>
+      <td>€1,576</td>
+      <td>€3,094</td>
+      <td>€-29,796</td>
+      <td>€13,970</td>
+      <td>€12,145</td>
+      <td>€398,852</td>
+      <td>€20,857</td>
+    </tr>
+    <tr>
+      <th>5 (2030)</th>
+      <td>€2,459</td>
+      <td>€445</td>
+      <td>€1,550</td>
+      <td>€1,346</td>
+      <td>€-7,842</td>
+      <td>€3,686</td>
+      <td>€2,476</td>
+      <td>€392,074</td>
+      <td>€35,881</td>
+    </tr>
+    <tr>
+      <th>6 (2031)</th>
+      <td>€2,520</td>
+      <td>€454</td>
+      <td>€1,523</td>
+      <td>€1,346</td>
+      <td>€-6,830</td>
+      <td>€3,209</td>
+      <td>€2,630</td>
+      <td>€384,969</td>
+      <td>€51,761</td>
+    </tr>
+    <tr>
+      <th>8 (2033)</th>
+      <td>€2,648</td>
+      <td>€472</td>
+      <td>€1,465</td>
+      <td>€1,346</td>
+      <td>€-4,708</td>
+      <td>€2,213</td>
+      <td>€2,945</td>
+      <td>€369,721</td>
+      <td>€85,419</td>
+    </tr>
+    <tr>
+      <th>10 (2035)</th>
+      <td>€2,782</td>
+      <td>€491</td>
+      <td>€1,401</td>
+      <td>€1,346</td>
+      <td>€-2,443</td>
+      <td>€1,148</td>
+      <td>€3,260</td>
+      <td>€352,972</td>
+      <td>€121,774</td>
+    </tr>
+    <tr>
+      <th>12 (2037)</th>
+      <td>€2,923</td>
+      <td>€511</td>
+      <td>€1,331</td>
+      <td>€1,346</td>
+      <td>€-25</td>
+      <td>€11</td>
+      <td>€3,575</td>
+      <td>€334,577</td>
+      <td>€161,043</td>
+    </tr>
+    <tr>
+      <th>15 (2040)</th>
+      <td>€3,148</td>
+      <td>€542</td>
+      <td>€1,212</td>
+      <td>€1,346</td>
+      <td>€3,911</td>
+      <td>€-1,840</td>
+      <td>€4,046</td>
+      <td>€303,536</td>
+      <td>€225,940</td>
+    </tr>
+    <tr>
+      <th>20 (2045)</th>
+      <td>€3,561</td>
+      <td>€599</td>
+      <td>€973</td>
+      <td>€1,346</td>
+      <td>€11,410</td>
+      <td>€-5,364</td>
+      <td>€4,807</td>
+      <td>€241,032</td>
+      <td>€352,255</td>
+    </tr>
+    <tr>
+      <th>21 (2046)</th>
+      <td>€3,650</td>
+      <td>€611</td>
+      <td>€918</td>
+      <td>€1,049</td>
+      <td>€16,632</td>
+      <td>€-7,817</td>
+      <td>€3,279</td>
+      <td>€226,673</td>
+      <td>€378,833</td>
+    </tr>
+    <tr>
+      <th>25 (2050)</th>
+      <td>€4,029</td>
+      <td>€661</td>
+      <td>€672</td>
+      <td>€0</td>
+      <td>€36,434</td>
+      <td>€-17,072</td>
+      <td>€-2,032</td>
+      <td>€162,006</td>
+      <td>€470,041</td>
+    </tr>
+    <tr>
+      <th>30 (2055)</th>
+      <td>€4,559</td>
+      <td>€730</td>
+      <td>€290</td>
+      <td>€0</td>
+      <td>€46,965</td>
+      <td>€-21,342</td>
+      <td>€-774</td>
+      <td>€62,091</td>
+      <td>€604,372</td>
+    </tr>
+    <tr>
+      <th>38 (2063)</th>
+      <td>€5,555</td>
+      <td>€855</td>
+      <td>€0</td>
+      <td>€0</td>
+      <td>€61,661</td>
+      <td>€-28,806</td>
+      <td>€27,587</td>
+      <td>€0</td>
+      <td>€878,734</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 6 =====
+[text/plain]
+                              10 years    15 years    20 years        at 67  \
+world                                                                         
+flat, 100% financed           €133,654    €246,719    €384,422     €983,022   
+flat, 90% financed            €121,774    €225,940    €352,255     €878,734   
+ETF + Rürup top-up 1,000 €    €-84,563   €-145,528   €-224,393    €-760,537   
+ETF-only wealth, for scale  €1,259,033  €2,243,731  €3,641,632  €14,506,296   
+
+                                  at 100 at 67, today's €  \
+world                                                       
+flat, 100% financed           €5,693,713         €463,187   
+flat, 90% financed            €5,002,043         €414,048   
+ETF + Rürup top-up 1,000 €   €-1,519,493        €-358,355   
+ETF-only wealth, for scale  €100,303,895       €6,835,181   
+
+                             ahead of ETF-only from  
+world                                                
+flat, 100% financed                   year 4 (2029)  
+flat, 90% financed                    year 4 (2029)  
+ETF + Rürup top-up 1,000 €  break-even at after 100  
+ETF-only wealth, for scale                           
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>10 years</th>
+      <th>15 years</th>
+      <th>20 years</th>
+      <th>at 67</th>
+      <th>at 100</th>
+      <th>at 67, today's €</th>
+      <th>ahead of ETF-only from</th>
+    </tr>
+    <tr>
+      <th>world</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>flat, 100% financed</th>
+      <td>€133,654</td>
+      <td>€246,719</td>
+      <td>€384,422</td>
+      <td>€983,022</td>
+      <td>€5,693,713</td>
+      <td>€463,187</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>flat, 90% financed</th>
+      <td>€121,774</td>
+      <td>€225,940</td>
+      <td>€352,255</td>
+      <td>€878,734</td>
+      <td>€5,002,043</td>
+      <td>€414,048</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>ETF + Rürup top-up 1,000 €</th>
+      <td>€-84,563</td>
+      <td>€-145,528</td>
+      <td>€-224,393</td>
+      <td>€-760,537</td>
+      <td>€-1,519,493</td>
+      <td>€-358,355</td>
+      <td>break-even at after 100</td>
+    </tr>
+    <tr>
+      <th>ETF-only wealth, for scale</th>
+      <td>€1,259,033</td>
+      <td>€2,243,731</td>
+      <td>€3,641,632</td>
+      <td>€14,506,296</td>
+      <td>€100,303,895</td>
+      <td>€6,835,181</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 7 =====
+[text/plain]
+<Figure size 1400x550 with 2 Axes>
+===== cell 8 =====
+[text/plain]
+                                                   90%: 10 y 90%: 20 y  \
+scenario                                                                 
+base case                                           €121,774  €352,255   
+AfA 3.85% only (no §7b)                              €68,586  €264,232   
+AfA 2% only (no Gutachten either)                    €24,197  €146,229   
+market return 4%                                    €139,740  €396,475   
+market return 8%                                     €99,935  €284,198   
+loan at 4.5%                                        €127,604  €366,766   
+loan at 5.5% for good                                €98,464  €294,571   
+no Makler fee (fees 8%)                             €144,476  €387,264   
+no vacancy                                          €133,125  €384,947   
+vacancy 10%                                         €110,371  €319,383   
+rent 1,850 € (defensible WG rent)                    €75,988  €220,179   
+rent 1,260 € (the sheet's own market rent)           €21,162   €62,248   
+price 440,000 €, worth the same                     €124,634  €360,137   
+the broker's inputs: 2,815 € rent, 673 € costs,...  €168,878  €490,002   
+AfA 2% and rent 1,850 €                             €-19,913   €17,836   
+paid 470,000 €, worth 423,000 €                      €66,200  €284,511   
+paid 470,000 €, worth 400,000 €                      €39,005  €251,359   
+paid 470,000 €, worth 360,000 €                      €-8,292  €193,705   
+
+                                                       90%: 67  \
+scenario                                                         
+base case                                             €878,734   
+AfA 3.85% only (no §7b)                               €728,404   
+AfA 2% only (no Gutachten either)                     €442,342   
+market return 4%                                    €1,026,740   
+market return 8%                                      €530,000   
+loan at 4.5%                                          €925,090   
+loan at 5.5% for good                                 €699,661   
+no Makler fee (fees 8%)                               €971,122   
+no vacancy                                          €1,005,942   
+vacancy 10%                                           €751,080   
+rent 1,850 € (defensible WG rent)                     €366,154   
+rent 1,260 € (the sheet's own market rent)           €-245,639   
+price 440,000 €, worth the same                       €940,755   
+the broker's inputs: 2,815 € rent, 673 € costs,...  €1,420,460   
+AfA 2% and rent 1,850 €                               €-59,122   
+paid 470,000 €, worth 423,000 €                       €781,978   
+paid 470,000 €, worth 400,000 €                       €734,630   
+paid 470,000 €, worth 360,000 €                       €652,284   
+
+                                                   90%: ahead from 100%: 10 y  \
+scenario                                                                        
+base case                                            year 4 (2029)   €133,654   
+AfA 3.85% only (no §7b)                              year 6 (2031)    €81,070   
+AfA 2% only (no Gutachten either)                    year 8 (2033)    €36,683   
+market return 4%                                     year 3 (2028)   €142,183   
+market return 8%                                     year 4 (2029)   €123,133   
+loan at 4.5%                                         year 4 (2029)   €140,139   
+loan at 5.5% for good                                year 4 (2029)   €107,718   
+no Makler fee (fees 8%)                              year 3 (2028)   €156,393   
+no vacancy                                           year 4 (2029)   €145,066   
+vacancy 10%                                          year 4 (2029)   €122,234   
+rent 1,850 € (defensible WG rent)                    year 4 (2029)    €87,816   
+rent 1,260 € (the sheet's own market rent)           year 7 (2032)    €32,863   
+price 440,000 €, worth the same                      year 4 (2029)   €135,890   
+the broker's inputs: 2,815 € rent, 673 € costs,...   year 3 (2028)   €180,821   
+AfA 2% and rent 1,850 €                             year 15 (2040)    €-7,422   
+paid 470,000 €, worth 423,000 €                      year 6 (2031)    €78,080   
+paid 470,000 €, worth 400,000 €                      year 8 (2033)    €50,884   
+paid 470,000 €, worth 360,000 €                     year 11 (2036)     €3,587   
+
+                                                   100%: 20 y    100%: 67  \
+scenario                                                                    
+base case                                            €384,422    €983,022   
+AfA 3.85% only (no §7b)                              €297,398    €835,385   
+AfA 2% only (no Gutachten either)                    €179,644    €550,020   
+market return 4%                                     €403,291  €1,045,642   
+market return 8%                                     €354,272    €831,014   
+loan at 4.5%                                         €400,576  €1,034,611   
+loan at 5.5% for good                                €320,212    €783,738   
+no Makler fee (fees 8%)                              €419,505  €1,075,607   
+no vacancy                                           €417,263  €1,110,627   
+vacancy 10%                                          €351,475    €855,211   
+rent 1,850 € (defensible WG rent)                    €252,201    €470,021   
+rent 1,260 € (the sheet's own market rent)            €94,072   €-142,291   
+price 440,000 €, worth the same                      €390,515  €1,039,076   
+the broker's inputs: 2,815 € rent, 673 € costs,...   €522,332  €1,525,126   
+AfA 2% and rent 1,850 €                               €50,997     €47,893   
+paid 470,000 €, worth 423,000 €                      €316,677    €886,267   
+paid 470,000 €, worth 400,000 €                      €283,526    €838,918   
+paid 470,000 €, worth 360,000 €                      €225,871    €756,573   
+
+                                                   100%: ahead from  
+scenario                                                             
+base case                                             year 4 (2029)  
+AfA 3.85% only (no §7b)                               year 6 (2031)  
+AfA 2% only (no Gutachten either)                     year 7 (2032)  
+market return 4%                                      year 3 (2028)  
+market return 8%                                      year 4 (2029)  
+loan at 4.5%                                          year 3 (2028)  
+loan at 5.5% for good                                 year 4 (2029)  
+no Makler fee (fees 8%)                               year 3 (2028)  
+no vacancy                                            year 3 (2028)  
+vacancy 10%                                           year 4 (2029)  
+rent 1,850 € (defensible WG rent)                     year 4 (2029)  
+rent 1,260 € (the sheet's own market rent)            year 6 (2031)  
+price 440,000 €, worth the same                       year 3 (2028)  
+the broker's inputs: 2,815 € rent, 673 € costs,...    year 3 (2028)  
+AfA 2% and rent 1,850 €                              year 12 (2037)  
+paid 470,000 €, worth 423,000 €                       year 6 (2031)  
+paid 470,000 €, worth 400,000 €                       year 8 (2033)  
+paid 470,000 €, worth 360,000 €                      year 10 (2035)  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>90%: 10 y</th>
+      <th>90%: 20 y</th>
+      <th>90%: 67</th>
+      <th>90%: ahead from</th>
+      <th>100%: 10 y</th>
+      <th>100%: 20 y</th>
+      <th>100%: 67</th>
+      <th>100%: ahead from</th>
+    </tr>
+    <tr>
+      <th>scenario</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>base case</th>
+      <td>€121,774</td>
+      <td>€352,255</td>
+      <td>€878,734</td>
+      <td>year 4 (2029)</td>
+      <td>€133,654</td>
+      <td>€384,422</td>
+      <td>€983,022</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>AfA 3.85% only (no §7b)</th>
+      <td>€68,586</td>
+      <td>€264,232</td>
+      <td>€728,404</td>
+      <td>year 6 (2031)</td>
+      <td>€81,070</td>
+      <td>€297,398</td>
+      <td>€835,385</td>
+      <td>year 6 (2031)</td>
+    </tr>
+    <tr>
+      <th>AfA 2% only (no Gutachten either)</th>
+      <td>€24,197</td>
+      <td>€146,229</td>
+      <td>€442,342</td>
+      <td>year 8 (2033)</td>
+      <td>€36,683</td>
+      <td>€179,644</td>
+      <td>€550,020</td>
+      <td>year 7 (2032)</td>
+    </tr>
+    <tr>
+      <th>market return 4%</th>
+      <td>€139,740</td>
+      <td>€396,475</td>
+      <td>€1,026,740</td>
+      <td>year 3 (2028)</td>
+      <td>€142,183</td>
+      <td>€403,291</td>
+      <td>€1,045,642</td>
+      <td>year 3 (2028)</td>
+    </tr>
+    <tr>
+      <th>market return 8%</th>
+      <td>€99,935</td>
+      <td>€284,198</td>
+      <td>€530,000</td>
+      <td>year 4 (2029)</td>
+      <td>€123,133</td>
+      <td>€354,272</td>
+      <td>€831,014</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>loan at 4.5%</th>
+      <td>€127,604</td>
+      <td>€366,766</td>
+      <td>€925,090</td>
+      <td>year 4 (2029)</td>
+      <td>€140,139</td>
+      <td>€400,576</td>
+      <td>€1,034,611</td>
+      <td>year 3 (2028)</td>
+    </tr>
+    <tr>
+      <th>loan at 5.5% for good</th>
+      <td>€98,464</td>
+      <td>€294,571</td>
+      <td>€699,661</td>
+      <td>year 4 (2029)</td>
+      <td>€107,718</td>
+      <td>€320,212</td>
+      <td>€783,738</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>no Makler fee (fees 8%)</th>
+      <td>€144,476</td>
+      <td>€387,264</td>
+      <td>€971,122</td>
+      <td>year 3 (2028)</td>
+      <td>€156,393</td>
+      <td>€419,505</td>
+      <td>€1,075,607</td>
+      <td>year 3 (2028)</td>
+    </tr>
+    <tr>
+      <th>no vacancy</th>
+      <td>€133,125</td>
+      <td>€384,947</td>
+      <td>€1,005,942</td>
+      <td>year 4 (2029)</td>
+      <td>€145,066</td>
+      <td>€417,263</td>
+      <td>€1,110,627</td>
+      <td>year 3 (2028)</td>
+    </tr>
+    <tr>
+      <th>vacancy 10%</th>
+      <td>€110,371</td>
+      <td>€319,383</td>
+      <td>€751,080</td>
+      <td>year 4 (2029)</td>
+      <td>€122,234</td>
+      <td>€351,475</td>
+      <td>€855,211</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>rent 1,850 € (defensible WG rent)</th>
+      <td>€75,988</td>
+      <td>€220,179</td>
+      <td>€366,154</td>
+      <td>year 4 (2029)</td>
+      <td>€87,816</td>
+      <td>€252,201</td>
+      <td>€470,021</td>
+      <td>year 4 (2029)</td>
+    </tr>
+    <tr>
+      <th>rent 1,260 € (the sheet's own market rent)</th>
+      <td>€21,162</td>
+      <td>€62,248</td>
+      <td>€-245,639</td>
+      <td>year 7 (2032)</td>
+      <td>€32,863</td>
+      <td>€94,072</td>
+      <td>€-142,291</td>
+      <td>year 6 (2031)</td>
+    </tr>
+    <tr>
+      <th>price 440,000 €, worth the same</th>
+      <td>€124,634</td>
+      <td>€360,137</td>
+      <td>€940,755</td>
+      <td>year 4 (2029)</td>
+      <td>€135,890</td>
+      <td>€390,515</td>
+      <td>€1,039,076</td>
+      <td>year 3 (2028)</td>
+    </tr>
+    <tr>
+      <th>the broker's inputs: 2,815 € rent, 673 € costs, no vacancy, no reserve</th>
+      <td>€168,878</td>
+      <td>€490,002</td>
+      <td>€1,420,460</td>
+      <td>year 3 (2028)</td>
+      <td>€180,821</td>
+      <td>€522,332</td>
+      <td>€1,525,126</td>
+      <td>year 3 (2028)</td>
+    </tr>
+    <tr>
+      <th>AfA 2% and rent 1,850 €</th>
+      <td>€-19,913</td>
+      <td>€17,836</td>
+      <td>€-59,122</td>
+      <td>year 15 (2040)</td>
+      <td>€-7,422</td>
+      <td>€50,997</td>
+      <td>€47,893</td>
+      <td>year 12 (2037)</td>
+    </tr>
+    <tr>
+      <th>paid 470,000 €, worth 423,000 €</th>
+      <td>€66,200</td>
+      <td>€284,511</td>
+      <td>€781,978</td>
+      <td>year 6 (2031)</td>
+      <td>€78,080</td>
+      <td>€316,677</td>
+      <td>€886,267</td>
+      <td>year 6 (2031)</td>
+    </tr>
+    <tr>
+      <th>paid 470,000 €, worth 400,000 €</th>
+      <td>€39,005</td>
+      <td>€251,359</td>
+      <td>€734,630</td>
+      <td>year 8 (2033)</td>
+      <td>€50,884</td>
+      <td>€283,526</td>
+      <td>€838,918</td>
+      <td>year 8 (2033)</td>
+    </tr>
+    <tr>
+      <th>paid 470,000 €, worth 360,000 €</th>
+      <td>€-8,292</td>
+      <td>€193,705</td>
+      <td>€652,284</td>
+      <td>year 11 (2036)</td>
+      <td>€3,587</td>
+      <td>€225,871</td>
+      <td>€756,573</td>
+      <td>year 10 (2035)</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 9 =====
+[text/plain]
+                           tax saved in 2026, per €      its pension at 67  \
+world                                                                        
+ETF + Rürup top-up 500 €                      47.0%  €2,517 (€1,186 today)   
+ETF + Rürup top-up 1,000 €                    47.0%  €5,034 (€2,372 today)   
+ETF + Rürup top-up 1,516 €                    47.0%  €7,632 (€3,596 today)   
+flat, 90% financed                                      €4,821 of net rent   
+flat, 100% financed                                     €4,821 of net rent   
+
+                             lead at 67  lead at 100 break-even  
+world                                                            
+ETF + Rürup top-up 500 €      €-380,158    €-737,192  after 100  
+ETF + Rürup top-up 1,000 €    €-760,537  €-1,519,493  after 100  
+ETF + Rürup top-up 1,516 €  €-1,153,841  €-2,376,746  after 100  
+flat, 90% financed             €878,734   €5,002,043             
+flat, 100% financed            €983,022   €5,693,713             
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tax saved in 2026, per €</th>
+      <th>its pension at 67</th>
+      <th>lead at 67</th>
+      <th>lead at 100</th>
+      <th>break-even</th>
+    </tr>
+    <tr>
+      <th>world</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ETF + Rürup top-up 500 €</th>
+      <td>47.0%</td>
+      <td>€2,517 (€1,186 today)</td>
+      <td>€-380,158</td>
+      <td>€-737,192</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>ETF + Rürup top-up 1,000 €</th>
+      <td>47.0%</td>
+      <td>€5,034 (€2,372 today)</td>
+      <td>€-760,537</td>
+      <td>€-1,519,493</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>ETF + Rürup top-up 1,516 €</th>
+      <td>47.0%</td>
+      <td>€7,632 (€3,596 today)</td>
+      <td>€-1,153,841</td>
+      <td>€-2,376,746</td>
+      <td>after 100</td>
+    </tr>
+    <tr>
+      <th>flat, 90% financed</th>
+      <td></td>
+      <td>€4,821 of net rent</td>
+      <td>€878,734</td>
+      <td>€5,002,043</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>flat, 100% financed</th>
+      <td></td>
+      <td>€4,821 of net rent</td>
+      <td>€983,022</td>
+      <td>€5,693,713</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+===== cell 10 =====
+[text/plain]
+                           statutory pensions net of insurance Rürup pensions  \
+world                                                                           
+ETF only                               €9,564           €8,652         €1,244   
+flat, 100% financed                    €9,564           €8,652         €1,244   
+flat, 90% financed                     €9,564           €8,652         €1,244   
+ETF + Rürup top-up 1,000 €             €9,564           €8,652         €3,570   
+
+                           net rent spending surplus ETF after tax  \
+world                                                                
+ETF only                         €0   €3,957  €5,085    €7,127,590   
+flat, 100% financed          €2,227   €3,957  €6,182    €7,148,390   
+flat, 90% financed           €2,227   €3,957  €6,182    €7,097,305   
+ETF + Rürup top-up 1,000 €       €0   €3,957  €7,191    €6,785,682   
+
+                           3% of it, a month  
+world                                         
+ETF only                             €17,819  
+flat, 100% financed                  €17,871  
+flat, 90% financed                   €17,743  
+ETF + Rürup top-up 1,000 €           €16,964  
+[text/html]
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>statutory pensions</th>
+      <th>net of insurance</th>
+      <th>Rürup pensions</th>
+      <th>net rent</th>
+      <th>spending</th>
+      <th>surplus</th>
+      <th>ETF after tax</th>
+      <th>3% of it, a month</th>
+    </tr>
+    <tr>
+      <th>world</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ETF only</th>
+      <td>€9,564</td>
+      <td>€8,652</td>
+      <td>€1,244</td>
+      <td>€0</td>
+      <td>€3,957</td>
+      <td>€5,085</td>
+      <td>€7,127,590</td>
+      <td>€17,819</td>
+    </tr>
+    <tr>
+      <th>flat, 100% financed</th>
+      <td>€9,564</td>
+      <td>€8,652</td>
+      <td>€1,244</td>
+      <td>€2,227</td>
+      <td>€3,957</td>
+      <td>€6,182</td>
+      <td>€7,148,390</td>
+      <td>€17,871</td>
+    </tr>
+    <tr>
+      <th>flat, 90% financed</th>
+      <td>€9,564</td>
+      <td>€8,652</td>
+      <td>€1,244</td>
+      <td>€2,227</td>
+      <td>€3,957</td>
+      <td>€6,182</td>
+      <td>€7,097,305</td>
+      <td>€17,743</td>
+    </tr>
+    <tr>
+      <th>ETF + Rürup top-up 1,000 €</th>
+      <td>€9,564</td>
+      <td>€8,652</td>
+      <td>€3,570</td>
+      <td>€0</td>
+      <td>€3,957</td>
+      <td>€7,191</td>
+      <td>€6,785,682</td>
+      <td>€16,964</td>
+    </tr>
+  </tbody>
+</table>
+</div>

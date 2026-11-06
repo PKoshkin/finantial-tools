@@ -137,13 +137,18 @@ one). The household re-assesses its income tax with that result in the zvE, so
 a rental loss becomes a refund and a profit a back-payment, arriving with the
 July settlement of the *following* year like any other — and a profit's tax is
 asked for in advance from then on. The AfA base is
-`(price + purchase fees) * building_share`, depreciating at `afa_rate` a year.
+`(price + purchase fees) * building_share`, depreciating at `afa_rate` a year
+plus, in the first `special_afa_years` years, `special_afa_rate` on top — the
+shape of a §7b Sonder-AfA, `RentalTaxation(afa_rate=0.0385, building_share=0.8,
+special_afa_rate=0.05, special_afa_years=4)` — until the base is written off:
+the last year takes what is left, the years after deduct nothing. The schedule
+is pinned against a broker's two-sheet calculation in
+`tests/test_afa_schedule.py`.
 
 Deliberate simplifications: umlagefähige Kosten are not modelled (they cancel
 between the Warmmiete and the expenses — the rent here is a Nettokaltmiete);
 a vacancy reduces the collected rent *and* the taxable result, unlike planning
-calculators that book a kalkulatorischer Mietausfall on top of full rent; AfA
-runs flat forever, overstating the deduction beyond `1 / afa_rate` years;
+calculators that book a kalkulatorischer Mietausfall on top of full rent;
 losses only offset income within their year (no Verlustvortrag); and the final
 year's tax settlement falls beyond the horizon and is dropped — conservative
 for a refund, but for a profitable flat it means the part of the last year's
@@ -375,6 +380,8 @@ All notebooks build the same kind of model and differ only in components:
 - `etf_withdrawal.ipynb` — ETF accumulation with a yearly percentage withdrawal
 - `take_home_share.ipynb` — net pay as a share of total employer cost, across the German salary range
 - `ruerup_vs_etf.ipynb` — a real Basisrente contract: what it yields, the same money in an ETF through retirement to 100, the break-even age, how much to contribute
+- `viernheim_flat_vs_etf_vs_ruerup.ipynb` — a real buy-to-let offer at 100% and 90% financing against an ETF and a Rürup top-up: the same household in four worlds to 100, each world's lead over the ETF, and what flips it
+- `ruerup_top_up_vs_etf.ipynb` — exactly 750 € a month and nothing else, into the ETF or into a Basisrente at the real contract's tariff (the refund spent, or invested), for a single earner at real market returns, in today's euros: what each world holds at 67, the first retired year's income side by side, how long the ETF lasts if it pays out the contract's pension, and a 150 € Altersvorsorgedepot (deducted like a Basisrente, no costs, paid out and taxed as income) against the ETF and the contract
 
 ## Tests
 
